@@ -19,7 +19,7 @@ export async function connectDB() {
   try {
     console.log("Connecting to MongoDB Atlas...");
     await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
-    console.log("Database connected successfully! 🎉");
+    console.log("Database connected successfully! ");
   } catch (error) {
     console.error("Database connection failed completely:", error);
     throw error;
