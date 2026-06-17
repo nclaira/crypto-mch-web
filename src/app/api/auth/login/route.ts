@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/db";
+import { connectDB } from "@/lib/db";  
 import { User } from "@/models/user"; // Uses our User structure blueprint
 import bcrypt from "bcryptjs";        // Tool to check the scrambled password
 import jwt from "jsonwebtoken";       // Tool to create the digital hand-stamp pass
@@ -34,23 +34,26 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Wrong password!" }, { status: 400 });
         }
 
-        // 6. Create the safe information for the hand-stamp (Token)
-        const tokenData = {
-            id: user._id,
-            username: user.username,
-            role: user.role
-        
-        };
+        // 6. Generate JWT Token
+        const token = jwt.sign(
+            { 
+                userId: user._id, 
+                username: user.username, 
+                role: user.role,
+                isPaid: user.isPaid  //you can change isPaid: to false or true to test in the postman
+            },
+            SECRET_KEY,
+            { expiresIn: "1d" }   //Generate the digital pass (JWT Token) that expires in 1 day
+        );
 
-        // 7. Generate the digital pass (JWT Token) that expires in 1 day
-        const token = jwt.sign(tokenData, SECRET_KEY, { expiresIn: "1d" });
+     
 
         // 8. Prepare a success message
         const response = NextResponse.json({ 
             message: "Login successful!",
             user: { username: user.username, 
                     role: user.role,
-                    isPaid: user.isPaid 
+                    isPaid: user.isPaid   // to test u change to false or true
                   }
 
         });
