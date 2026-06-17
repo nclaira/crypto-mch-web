@@ -39,6 +39,7 @@ export async function POST(request: Request) {
             id: user._id,
             username: user.username,
             role: user.role
+        
         };
 
         // 7. Generate the digital pass (JWT Token) that expires in 1 day
@@ -47,8 +48,14 @@ export async function POST(request: Request) {
         // 8. Prepare a success message
         const response = NextResponse.json({ 
             message: "Login successful!",
-            user: { username: user.username, role: user.role }
+            user: { username: user.username, 
+                    role: user.role,
+                    isPaid: user.isPaid 
+                  }
+
         });
+
+        
 
         // 9. Drop the pass into the user's browser storage (Cookie)
         response.cookies.set("token", token, {

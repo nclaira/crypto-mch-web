@@ -23,6 +23,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: "user"   // Every new sign-up is a regular "user". You can manually change yourself to "admin" later in MongoDB Compass!
     },
+
+    // THIS IS OUR NEW ACCESS CONTROL SWITCH
+    isPaid: {
+        type: Boolean,
+        default: false // Everyone starts as a free user until they buy a subscription
+    },
     createdAt: {
         type: Date,
         default: Date.now // Automatically logs the exact date and time they registered
@@ -32,4 +38,5 @@ const UserSchema = new mongoose.Schema({
 // Why do we do this line? Next.js re-runs code a lot. 
 // This checks: "Does a User blueprint already exist?" If yes, use it. If no, create it.
 export const User = mongoose.models.User || mongoose.model("User", UserSchema);
+
 
