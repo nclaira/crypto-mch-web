@@ -57,6 +57,9 @@ export async function POST(request: Request) {
                   }
 
         });
+        git add src/app/books src/app/categories src/app/trending
+git commit -m "feat: complete categories marketplace and paywall routing structures"
+git push origin main
 
         
 
@@ -73,3 +76,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Login server crashed" }, { status: 500 });
     }
 }
+
