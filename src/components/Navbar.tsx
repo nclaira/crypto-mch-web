@@ -6,31 +6,36 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X, LogOut } from "lucide-react";
+import { useCryptoAuth } from "@/lib/auth"; // Global auth context
 
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const user = null; // TODO: wire up your auth context
-  const logout = () => {};
+  // Read the logged-in user and the setUser function from the global auth context
+  // user is null when logged out, or { username, role, isPaid } when logged in
+  const { user, setUser } = useCryptoAuth();
+
+  // Logout: clear the user from context (also clears localStorage via setUser)
+  const logout = () => setUser(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
   const handleLogout = () => {
     logout();
-    router.push("/crypto");
+    router.push("/");
   };
 
   const links = [
-    { to: "/crypto", label: "Home" },
-    { to: "/crypto/categories", label: "Categories" },
-    { to: "/crypto/books", label: "Books" },
-    { to: "/crypto/trending", label: "Trending" },
-    { to: "/crypto/contact", label: "Contact" },
+    { to: "/", label: "Home" },
+    { to: "/categories", label: "Categories" },
+    { to: "/books", label: "Books" },
+    { to: "/trending", label: "Trending" },
+    { to: "/contact", label: "Contact" },
   ];
 
   const isActive = (to: string) =>
-    to === "/crypto" ? pathname === "/crypto" : pathname?.startsWith(to);
+    to === "/" ? pathname === "/" : pathname?.startsWith(to);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-[#d4af37]/15 bg-[#0d1117]/85 backdrop-blur-xl">
@@ -72,13 +77,13 @@ const Navbar = () => {
           {!user ? (
             <>
               <Link
-                href="/crypto/login"
+                href="/login"
                 className="rounded-lg border border-[#d4af37]/30 px-4 py-2 text-sm font-medium tracking-wide text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
               >
                 Login
               </Link>
               <Link
-                href="/crypto/signup"
+                href="/signup"
                 className="rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-4 py-2 text-sm font-semibold tracking-wide text-black shadow-[0_8px_25px_-10px_rgba(212,175,55,0.7)] transition hover:scale-[1.03]"
               >
                 Sign Up
@@ -120,8 +125,8 @@ const Navbar = () => {
           <div className="mt-3 flex gap-2">
             {!user ? (
               <>
-                <Link href="/crypto/login" className="flex-1 rounded-lg border border-[#d4af37]/30 py-2 text-center text-sm">Login</Link>
-                <Link href="/crypto/signup" className="flex-1 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] py-2 text-center text-sm font-semibold text-black">Sign Up</Link>
+                <Link href="/login" className="flex-1 rounded-lg border border-[#d4af37]/30 py-2 text-center text-sm">Login</Link>
+                <Link href="/signup" className="flex-1 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] py-2 text-center text-sm font-semibold text-black">Sign Up</Link>
               </>
             ) : (
               <button onClick={handleLogout} className="w-full rounded-lg border border-[#d4af37]/30 py-2 text-sm">Logout</button>

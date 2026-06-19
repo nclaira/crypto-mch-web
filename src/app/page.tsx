@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { Sparkles, TrendingUp, ShieldCheck } from "lucide-react";
 import HeroChart from "../components/HeroChart";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { downloadBook } from "../lib/api";
+import { useCryptoAuth } from "@/lib/auth"; // Real auth context — no more null placeholder
 
 const trendingNews = [
   { id: 1, title: "Bitcoin breaks $100K resistance with record volume", source: "CryptoDaily", time: "2h" },
@@ -15,17 +15,20 @@ const trendingNews = [
 ];
 
 const Home = () => {
-  const user = null; // TODO: wire up your auth context
+  // Read the logged-in user from the global auth context (set after login)
+  const { user } = useCryptoAuth();
   const [paywall, setPaywall] = useState<string | null>(null);
 
+  // If user is not logged in, show the paywall modal instead of navigating
   const handlePaid = (name: string) => {
     if (!user) {
       setPaywall(name);
       return;
     }
-    window.location.href = "/crypto/books";
+    window.location.href = "/books";
   };
 
+  // Try to download a free preview — show paywall if backend blocks it
   const handleFreePreview = async () => {
     const res = await downloadBook("preview", "mucamanza-preview.pdf");
     if (!res.ok && (res.status === 401 || res.status === 403)) {
@@ -34,10 +37,10 @@ const Home = () => {
   };
 
   return (
+    // Navbar is rendered once in layout.tsx — do NOT add it here again
     <div className="min-h-screen bg-[#0d1117] text-white">
-      <Navbar />
 
-      {/* ============== HERO ============== */}
+      {/* HERO */}
       <section className="relative overflow-hidden">
         <div
           aria-hidden
@@ -67,13 +70,13 @@ const Home = () => {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/crypto/categories"
+                href="/categories"
                 className="rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black shadow-[0_15px_40px_-15px_rgba(212,175,55,0.7)] transition hover:scale-[1.02]"
               >
                 Enter the Hub
               </Link>
               <Link
-                href="/crypto/books"
+                href="/books"
                 className="rounded-xl border border-[#d4af37]/40 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#f3e5ab] transition hover:border-[#d4af37] hover:bg-[#d4af37]/10"
               >
                 Explore Books
@@ -102,7 +105,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ============== CATEGORIES PREVIEW ============== */}
+      {/* CATEGORIES PREVIEW */}
       <section className="mx-auto max-w-7xl px-4 py-20">
         <div className="mb-12 flex items-end justify-between">
           <div>
@@ -112,7 +115,7 @@ const Home = () => {
               <span className="text-gray-200">Tracks</span>
             </h2>
           </div>
-          <Link href="/crypto/categories" className="hidden text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-[#f3e5ab] md:inline">
+          <Link href="/categories" className="hidden text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-[#f3e5ab] md:inline">
             View all →
           </Link>
         </div>
@@ -138,7 +141,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ============== TRENDING FEED ============== */}
+      {/* TRENDING FEED */}
       <section className="border-y border-[#d4af37]/10 bg-black/30">
         <div className="mx-auto max-w-7xl px-4 py-20">
           <div className="mb-10 flex items-end justify-between">
@@ -149,7 +152,7 @@ const Home = () => {
                 <span className="text-gray-200">Trending Now</span>
               </h2>
             </div>
-            <Link href="/crypto/trending" className="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-[#f3e5ab]">
+            <Link href="/trending" className="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-[#f3e5ab]">
               View dashboard →
             </Link>
           </div>
@@ -173,7 +176,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ============== TRUST STRIP ============== */}
+      {/* TRUST STRIP */}
       <section className="mx-auto max-w-7xl px-4 py-16 text-center">
         <ShieldCheck className="mx-auto h-8 w-8 text-[#d4af37]" />
         <p className="mt-3 text-sm uppercase tracking-[0.3em] text-gray-400">
@@ -181,14 +184,14 @@ const Home = () => {
         </p>
       </section>
 
-      {/* Paywall modal placeholder */}
+      {/* Paywall modal — shown when a guest tries to access paid content */}
       {paywall && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="rounded-2xl border border-[#d4af37]/30 bg-[#0d1117] p-8 text-center max-w-sm">
             <h2 className="text-lg font-bold text-[#f3e5ab]">Purchase Required</h2>
             <p className="mt-2 text-sm text-gray-400">You need to purchase access to unlock <strong>{paywall}</strong>.</p>
             <div className="mt-6 flex gap-3 justify-center">
-              <Link href="/crypto/signup" className="rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] px-5 py-2 text-sm font-semibold text-black">Get Access</Link>
+              <Link href="/signup" className="rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] px-5 py-2 text-sm font-semibold text-black">Get Access</Link>
               <button onClick={() => setPaywall(null)} className="rounded-lg border border-white/10 px-5 py-2 text-sm text-gray-300">Close</button>
             </div>
           </div>
