@@ -20,11 +20,10 @@ import { useState } from "react";
 import { RefreshCw, TrendingUp, TrendingDown, Trophy, Copy } from "lucide-react";
 import Footer from "@/components/Footer";
 
-// ---------------------------------------------------------------
 // NEWS FEED DATA — ADD NEW ARTICLES HERE
 // Each article needs: id, cat, title, src, time
 // cat: "Crypto" or "Forex" (controls the badge color)
-// ---------------------------------------------------------------
+
 const news = [
   { id: 1, cat: "Crypto", title: "BTC reclaims $100K — dealer gamma flips long",  src: "CryptoDaily", time: "2h" },
   { id: 2, cat: "Forex",  title: "ECB pivots dovish — EUR/USD rallies 80 pips",    src: "ForexLive",   time: "4h" },
@@ -33,21 +32,21 @@ const news = [
   { id: 5, cat: "Crypto", title: "Solana RWA volume crosses $1B",                   src: "The Block",   time: "12h" },
   { id: 6, cat: "Forex",  title: "GBP/USD eyes 1.30 after CPI surprise",            src: "FXStreet",    time: "1d" },
 
-  // ✏️  ADD A NEW ARTICLE HERE:
+  //  ADD A NEW ARTICLE HERE:
   // { id: 7, cat: "Crypto", title: "Your headline here", src: "Source Name", time: "1h" },
 ];
 
-// ---------------------------------------------------------------
+
 // COPY TRADING PROFILES — ADD NEW TRADERS HERE
 // trend: "up" = green card border, "down" = grey card border
-// ---------------------------------------------------------------
+
 const traders = [
   { handle: "claire_dev",   role: "Quant",  return30: 42.8, winRate: 78, trades: 142, copying: 312, trend: "up"   as const },
   { handle: "alpha_macro",  role: "Macro",  return30: 31.5, winRate: 71, trades: 88,  copying: 220, trend: "up"   as const },
   { handle: "neo_scalper",  role: "Scalp",  return30: -4.2, winRate: 49, trades: 412, copying: 95,  trend: "down" as const },
   { handle: "mucamanza_v1", role: "Hybrid", return30: 58.1, winRate: 81, trades: 65,  copying: 540, trend: "up"   as const },
 
-  // ✏️  ADD A NEW TRADER HERE:
+  //  ADD A NEW TRADER HERE:
   // { handle: "your_handle", role: "Swing", return30: 20.0, winRate: 65, trades: 50, copying: 100, trend: "up" },
 ];
 
@@ -85,7 +84,7 @@ export default function TrendingPage() {
           </button>
         </div>
 
-        {/* ── SECTION 1: NEWS FEED ── */}
+        {/*  SECTION 1: NEWS FEED  */}
         <section className="mt-12">
           <h2 className="mb-5 text-sm uppercase tracking-[0.25em] text-gray-400">
             Crypto & Forex News
@@ -123,7 +122,7 @@ export default function TrendingPage() {
           </div>
         </section>
 
-        {/* ── SECTION 2: COPY TRADING LEADERBOARD ── */}
+        {/* SECTION 2: COPY TRADING LEADERBOARD  */}
         <section className="mt-16">
           <div className="mb-5 flex items-center gap-2">
             <Trophy className="h-5 w-5 text-[#d4af37]" />
@@ -190,4 +189,8 @@ export default function TrendingPage() {
       <Footer />
     </div>
   );
-}
+}  // in components, i have BookCard.tsx,CategoryCard.tsx,Footer.tsx, Freelesson.tsx,HeroChart.tsx,Layout.tsx,Navbar.tsx,PaywallModal.tsx,StatusBanner.tsx 
+//in pages  there are:basic-crypto/page1.tsx,page2.tsx and page3.tsx.    and basic-forex/page1.tsx,page2.tsx and page3.tsx.  Book.tsx,Categories.tsx, contact.tsx,cryptoTrading.tsx,ForexTrading.tsx,Hoe.tsx,login.tsx,signup and trending
+//in hooks there are:use-mobile.tsx,use-toast.ts
+
+
