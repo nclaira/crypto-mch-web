@@ -18,8 +18,8 @@
 import Link from "next/link";                          // Next.js link (replaces React Router)
 import { useState } from "react";
 import PaywallModal from "@/components/PaywallModal";  // Access denied popup
-import { downloadBook } from "@/lib/api";
-import { Download, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import DownloadButton from "@/components/DownloadButton";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Props = {
   topic: string;
@@ -27,27 +27,13 @@ type Props = {
   title: string;
   intro: string;
   sections: { heading: string; body: string }[];
+  fileUrl?: string;   // UploadThing CDN URL for the PDF download
   prevHref?: string;  // e.g. "/basic-crypto/page1" — leave empty on first page
   nextHref?: string;  // e.g. "/basic-crypto/page2" — leave empty on last page
 };
 
-const FreeLesson = ({ topic, pageNumber, title, intro, sections, prevHref, nextHref }: Props) => {
-  const [loading, setLoading] = useState(false);
+const FreeLesson = ({ topic, pageNumber, title, intro, sections, fileUrl, prevHref, nextHref }: Props) => {
   const [paywall, setPaywall] = useState(false);
-
-  // Hits GET /api/books/download?type=preview to download the lesson PDF
-  const handleDownload = async () => {
-    setLoading(true);
-    const res = await downloadBook(
-      "preview",
-      `${topic.replace(/\s+/g, "-")}-lesson-${pageNumber}.pdf`
-    );
-    setLoading(false);
-    // If backend blocks it (401/403), show the paywall popup
-    if (!res.ok && (res.status === 401 || res.status === 403)) {
-      setPaywall(true);
-    }
-  };
 
   return (
     // No <Layout> needed — src/app/layout.tsx already wraps every page
@@ -78,15 +64,19 @@ const FreeLesson = ({ topic, pageNumber, title, intro, sections, prevHref, nextH
         ))}
       </div>
 
-      {/* Download PDF button */}
-      <button
-        onClick={handleDownload}
-        disabled={loading}
-        className="mt-10 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-black shadow-[0_15px_40px_-15px_rgba(212,175,55,0.7)] transition hover:scale-[1.02] disabled:opacity-60"
-      >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-        {loading ? "Preparing PDF..." : "Download Preview PDF"}
-      </button>
+      {/* Download PDF button — only shown if a fileUrl was provided */}
+      {fileUrl ? (
+        <div className="mt-10">
+          <DownloadButton fileUrl={fileUrl} title={title} label="Download Preview PDF" />
+        </div>
+      ) : (
+        <button
+          onClick={() => setPaywall(true)}
+          className="mt-10 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-black shadow-[0_15px_40px_-15px_rgba(212,175,55,0.7)] transition hover:scale-[1.02]"
+        >
+          Download Preview PDF
+        </button>
+      )}
 
       {/* Previous / Next navigation */}
       <div className="mt-14 flex justify-between border-t border-[#d4af37]/10 pt-6 text-xs uppercase tracking-[0.2em]">

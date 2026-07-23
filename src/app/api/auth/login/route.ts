@@ -5,8 +5,7 @@ import bcrypt from "bcryptjs";        // Tool to check the scrambled password
 import jwt from "jsonwebtoken";       // Tool to create the digital hand-stamp pass
 
 
-// A temporary secret key to lock your tokens offline
-const SECRET_KEY = "my_super_secret_offline_key";
+const SECRET_KEY = process.env.JWT_SECRET || "my_super_secret_offline_key";
 
 export async function POST(request: Request) {
     try {
@@ -57,10 +56,6 @@ export async function POST(request: Request) {
                   }
 
         });
-        git add src/app/books src/app/categories src/app/trending
-git commit -m "feat: complete categories marketplace and paywall routing structures"
-git push origin main
-
         
 
         // 9. Drop the pass into the user's browser storage (Cookie)
@@ -76,4 +71,3 @@ git push origin main
         return NextResponse.json({ error: "Login server crashed" }, { status: 500 });
     }
 }
-

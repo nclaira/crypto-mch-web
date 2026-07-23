@@ -1,63 +1,40 @@
 "use client";
-// =============================================================
-// Books Page — /books
-// =============================================================
-// Shows all books in the library using the BookCard component.
-// Each book is either "free" (preview) or "full" (paid).
-//
-// HOW TO ADD A NEW BOOK:
-//   Add a new object to the `catalog` array below.
-//   tier: "free"  = anyone can download a preview
-//   tier: "full"  = only paid members can download
-// =============================================================
 
-import { useState } from "react";
-import BookCard, { Book } from "@/components/BookCard";       // Reusable book card
-import PaywallModal from "@/components/PaywallModal";         // Access denied popup
+import { useState, useEffect } from "react";
+import BookCard, { Book } from "@/components/BookCard";
+import PaywallModal from "@/components/PaywallModal";
 import Footer from "@/components/Footer";
 import { useCryptoAuth } from "@/lib/auth";
-import { downloadBook } from "@/lib/api";
-
-// ---------------------------------------------------------------
-// BOOK CATALOG — ADD YOUR NEW BOOKS HERE
-// ---------------------------------------------------------------
-const catalog: Book[] = [
-  { id: 1, title: "Crypto Market Microstructure",  author: "M. Mucamanza",       tier: "full" },
-  { id: 2, title: "Forex Macro Playbook",           author: "Institutional Desk", tier: "full" },
-  { id: 3, title: "On-Chain Signal Architecture",   author: "Mucamanza Labs",     tier: "full" },
-  { id: 4, title: "Basic Crypto — Free Preview",    author: "Mucamanza Edu",      tier: "free" },
-  { id: 5, title: "Basic Forex — Free Preview",     author: "Mucamanza Edu",      tier: "free" },
-  { id: 6, title: "Risk & Position Sizing 101",     author: "Mucamanza Edu",      tier: "free" },
-
-  // ✏️ ADD A NEW BOOK HERE — copy and fill in:
-  // { id: 7, title: "Your Book Title", author: "Author Name", tier: "full" },
-];
 
 export default function BooksPage() {
   const { user } = useCryptoAuth();
-
-  // When paywall has a value, the PaywallModal popup opens
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
   const [paywall, setPaywall] = useState<string | null>(null);
 
-  // Runs when a user clicks Download or Unlock on a BookCard
-  const handleAction = async (book: Book) => {
-    if (book.tier === "free") {
-      // Free book — download a preview from the backend
-      const res = await downloadBook("preview", `${book.title}.pdf`);
-      if (!res.ok && (res.status === 401 || res.status === 403)) {
-        setPaywall(book.title); // Backend blocked it — show paywall
-      }
-      return;
-    }
+  useEffect(() => {
+    fetch("/api/admin/books")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setBooks(
+            data.books.map((b: any) => ({
+              id: b._id,
+              title: b.title,
+              author: b.author,
+              tier: b.accessType === "Free" ? "free" : "full",
+              fileUrl: b.pdfUrl,   // UploadThing CDN URL — passed to DownloadButton
+            }))
+          );
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
-    // Full book — only paid users can access
+  // Only called for "full" tier books — opens paywall
+  const handleAction = (book: Book) => {
     if (!user || !user.isPaid) {
-      setPaywall(book.title);
-      return;
-    }
-
-    const res = await downloadBook("full", `${book.title}.pdf`);
-    if (!res.ok && (res.status === 401 || res.status === 403)) {
       setPaywall(book.title);
     }
   };
@@ -66,7 +43,6 @@ export default function BooksPage() {
     <div className="min-h-screen bg-[#0d1117] text-white">
       <div className="mx-auto max-w-7xl px-4 py-20">
 
-        {/* Page heading */}
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-[#d4af37]">Library</p>
           <h1 className="mt-3 text-4xl font-bold md:text-5xl">
@@ -79,15 +55,19 @@ export default function BooksPage() {
           </p>
         </div>
 
-        {/* Book grid — renders one BookCard per book in the catalog */}
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {catalog.map((book) => (
-            <BookCard key={book.id} book={book} onAction={handleAction} />
-          ))}
-        </div>
+        {loading ? (
+          <p className="mt-16 text-center text-gray-400">Loading library...</p>
+        ) : books.length === 0 ? (
+          <p className="mt-16 text-center text-gray-400">No books published yet.</p>
+        ) : (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {books.map((book) => (
+              <BookCard key={book.id} book={book} onAction={handleAction} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Paywall popup — opens when a non-paid user tries to access a full book */}
       <PaywallModal
         open={!!paywall}
         onClose={() => setPaywall(null)}

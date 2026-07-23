@@ -1,8 +1,9 @@
 "use client";
 // BookCard — single resource in the Books grid
-// Two tiers: "free" (preview download) | "full" (premium, paywalled)
+// Two tiers: "free" (direct download) | "full" (premium, paywalled)
 
-import { BookOpen, Download, Lock } from "lucide-react";
+import { BookOpen, Lock } from "lucide-react";
+import DownloadButton from "@/components/DownloadButton";
 
 export type Book = {
   id: number;
@@ -10,11 +11,12 @@ export type Book = {
   author: string;
   tier: "free" | "full";
   cover?: string;
+  fileUrl?: string;   // UploadThing CDN URL — required for free tier downloads
 };
 
 type Props = {
   book: Book;
-  onAction: (book: Book) => void;
+  onAction: (book: Book) => void;  // Called for "full" tier to open paywall
 };
 
 const BookCard = ({ book, onAction }: Props) => {
@@ -46,13 +48,27 @@ const BookCard = ({ book, onAction }: Props) => {
         <div className="flex flex-1 flex-col p-5">
           <h3 className="font-semibold tracking-wide text-gray-100">{book.title}</h3>
           <p className="mt-1 text-xs uppercase tracking-[0.18em] text-gray-500">by {book.author}</p>
-          <button
-            onClick={() => onAction(book)}
-            className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg border border-[#d4af37]/40 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#f3e5ab] transition hover:border-[#d4af37] hover:bg-[#d4af37]/10"
-          >
-            {isFree ? <Download className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-            {isFree ? "Download Preview" : "Unlock Full"}
-          </button>
+
+          <div className="mt-5">
+            {isFree && book.fileUrl ? (
+              // Free tier — direct Blob download via UploadThing CDN URL
+              <DownloadButton
+                fileUrl={book.fileUrl}
+                title={book.title}
+                label="Download Preview"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#d4af37]/40 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#f3e5ab] transition hover:border-[#d4af37] hover:bg-[#d4af37]/10"
+              />
+            ) : (
+              // Full tier — opens paywall modal
+              <button
+                onClick={() => onAction(book)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#d4af37]/40 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#f3e5ab] transition hover:border-[#d4af37] hover:bg-[#d4af37]/10"
+              >
+                <Lock className="h-3.5 w-3.5" />
+                Unlock Full
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

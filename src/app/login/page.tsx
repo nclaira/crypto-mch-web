@@ -44,9 +44,9 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res.ok) {
-      // Save the user info globally so Navbar and other pages can read it
       setUser(res.data.user);
-      router.push("/"); // Redirect to home after successful login
+      // Redirect admin to dashboard, regular users to home
+      router.push(res.data.user.role === "admin" ? "/admin" : "/");
     } else {
       // Show the error from the backend (e.g. "Wrong password!")
       setError(res.error);
@@ -54,7 +54,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto my-20 max-w-md px-4">
+    <div className="mx-auto my-20 w-full max-w-4xl px-8">
       {/* Page heading */}
       <div className="text-center">
         <p className="text-[10px] uppercase tracking-[0.35em] text-[#d4af37]">Member Access</p>
@@ -71,7 +71,7 @@ export default function LoginPage() {
         className="mt-8 rounded-2xl p-[1px] transition focus-within:shadow-[0_0_60px_-15px_rgba(212,175,55,0.55)]"
         style={{ backgroundImage: "linear-gradient(135deg,#d4af37,#9ca3af,#f3e5ab,#d4af37)" }}
       >
-        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl bg-[#0d1117] p-7">
+        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl bg-[#0d1117] p-12">
 
           {/* Error banner — only shown when login fails */}
           {error && (

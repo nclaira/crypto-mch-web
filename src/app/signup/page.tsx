@@ -1,13 +1,11 @@
 "use client";
-// =============================================================
 // Signup Page — /signup
-// =============================================================
+
 // This page lets a new user create an account. When they submit:
 //   1. We validate passwords match on the frontend
 //   2. We POST { username, email, password } to /api/auth/signup
 //   3. On success, we redirect them to /login to sign in
 //   4. On failure, we show the backend error message
-// =============================================================
 
 import { useState } from "react";
 import Link from "next/link";
@@ -79,7 +77,7 @@ export default function SignupPage() {
   ];
 
   return (
-    <div className="mx-auto my-20 max-w-md px-4">
+    <div className="mx-auto my-20 w-full max-w-4xl px-8">
       {/* Page heading */}
       <div className="text-center">
         <p className="text-[10px] uppercase tracking-[0.35em] text-[#d4af37]">Join the Hub</p>
@@ -96,7 +94,7 @@ export default function SignupPage() {
         className="mt-8 rounded-2xl p-[1px] transition focus-within:shadow-[0_0_60px_-15px_rgba(212,175,55,0.55)]"
         style={{ backgroundImage: "linear-gradient(135deg,#d4af37,#9ca3af,#f3e5ab,#d4af37)" }}
       >
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-[#0d1117] p-7">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-[#0d1117] p-12">
 
           {/* Error banner */}
           {error && (
@@ -106,7 +104,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Render all 4 input fields from the config array above */}
+          {/* Fields stacked vertically */}
           {fields.map(({ icon: Icon, key, type, placeholder }) => (
             <div key={key} className="relative">
               <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -122,6 +120,7 @@ export default function SignupPage() {
           ))}
 
           {/* Submit button */}
+
           <button
             type="submit"
             disabled={loading}

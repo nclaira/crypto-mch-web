@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/db";     
+import { connectDB } from "@/lib/db";
 import Book from "@/models/book";
 import { writeFile } from "fs/promises";
 import { join } from "path";

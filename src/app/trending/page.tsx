@@ -189,8 +189,4 @@ export default function TrendingPage() {
       <Footer />
     </div>
   );
-}  // in components, i have BookCard.tsx,CategoryCard.tsx,Footer.tsx, Freelesson.tsx,HeroChart.tsx,Layout.tsx,Navbar.tsx,PaywallModal.tsx,StatusBanner.tsx 
-//in pages  there are:basic-crypto/page1.tsx,page2.tsx and page3.tsx.    and basic-forex/page1.tsx,page2.tsx and page3.tsx.  Book.tsx,Categories.tsx, contact.tsx,cryptoTrading.tsx,ForexTrading.tsx,Hoe.tsx,login.tsx,signup and trending
-//in hooks there are:use-mobile.tsx,use-toast.ts
-
-
+}

@@ -5,6 +5,8 @@
 //   • the logged-in user state shows isPaid === false
 
 import { Lock, X, ShieldCheck, Sparkles } from "lucide-react";
+import FlutterwaveButton from "@/components/FlutterwaveButton";
+import { useCryptoAuth } from "@/lib/auth"; // Imports auth state to get user email/ID
 
 type Props = {
   open: boolean;
@@ -13,6 +15,8 @@ type Props = {
 };
 
 const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium" }: Props) => {
+  const { user } = useCryptoAuth();
+
   if (!open) return null;
 
   return (
@@ -55,16 +59,16 @@ const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium"
             <li className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-[#d4af37]" /> Premium signal community</li>
           </ul>
 
-          {/* FUTURE ADDITION: wire this to a real checkout flow (Stripe / crypto wallet payment). */}
-          <button
-            onClick={() => alert("Checkout flow coming soon — wire to /api/payments/checkout")}
-            className="mt-7 w-full rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37]
-                       px-6 py-3 font-semibold tracking-wide text-black
-                       shadow-[0_8px_30px_-8px_rgba(212,175,55,0.6)]
-                       transition hover:scale-[1.02]"
-          >
-            Unlock Full Access Now
-          </button>
+          {/* ACTIVE FLUTTERWAVE PAYMENT BUTTON */}
+          <div className="mt-7">
+            <FlutterwaveButton
+              email={user?.username || "customer@example.com"}
+              name={user?.username || "Customer"}
+              amount={5000}
+              bookId={resourceName}
+              userId={user?.username || "guest_user"}
+            />
+          </div>
 
           <button
             onClick={onClose}

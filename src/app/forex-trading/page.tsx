@@ -1,9 +1,9 @@
-// FOREX TRADING (PAID) — /crypto/forex-trading
+"use client";
+// FOREX TRADING (PAID) — /forex-trading
 
 import { useState } from "react";
-import Layout from "../components/Layout";
-import PaywallModal from "../components/PaywallModal";
-import { useCryptoAuth } from "../lib/auth";
+import PaywallModal from "@/components/PaywallModal";
+import { useCryptoAuth } from "@/lib/auth";
 import { Lock, Globe, LineChart, BookOpen, ShieldCheck } from "lucide-react";
 
 const features = [
@@ -18,7 +18,7 @@ const ForexTrading = () => {
   const [paywall, setPaywall] = useState(false);
 
   return (
-    <Layout>
+    <div className="min-h-screen bg-[#0d1117] text-white">
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
         <div className="mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#d4af37] to-[#8a6d1f] shadow-[0_0_60px_-10px_rgba(212,175,55,0.6)]">
           <Lock className="h-9 w-9 text-black" />
@@ -49,7 +49,7 @@ const ForexTrading = () => {
         </button>
       </div>
       <PaywallModal open={paywall} onClose={() => setPaywall(false)} resourceName="Forex Trading" />
-    </Layout>
+    </div>
   );
 };
 

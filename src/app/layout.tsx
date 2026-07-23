@@ -12,6 +12,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "@uploadthing/react/styles.css";
 import { CryptoAuthProvider } from "@/lib/auth"; // Global auth context
 import Navbar from "@/components/Navbar";         // Top navigation bar
 

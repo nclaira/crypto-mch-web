@@ -1,28 +1,21 @@
 "use client";
-// =============================================================
-// Navbar — sticky premium header with Mucamanza Crypto Hub logo
-// =============================================================
+
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut } from "lucide-react";
-import { useCryptoAuth } from "@/lib/auth"; // Global auth context
+import { Menu, X, LogOut, ShieldCheck } from "lucide-react";
+import { useCryptoAuth } from "@/lib/auth";
 
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  // Read the logged-in user and the setUser function from the global auth context
-  // user is null when logged out, or { username, role, isPaid } when logged in
   const { user, setUser } = useCryptoAuth();
-
-  // Logout: clear the user from context (also clears localStorage via setUser)
-  const logout = () => setUser(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
   const handleLogout = () => {
-    logout();
+    setUser(null);
     router.push("/");
   };
 
@@ -39,13 +32,15 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-[#d4af37]/15 bg-[#0d1117]/85 backdrop-blur-xl">
-      {/* Hair-thin gold gradient bar */}
       <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#d4af37]/70 to-transparent" />
 
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
+
         {/* Logo */}
-        <Link href="/crypto" className="group flex items-center gap-3">
-          <div className="relative h-12 w-12 overflow-hidden rounded-full ring-1 ring-[#d4af37]/40 shadow-[0_0_25px_-6px_rgba(212,175,55,0.6)] bg-[#d4af37]/20" />
+        <Link href="/" className="group flex items-center gap-3 shrink-0">
+          <div className="relative h-12 w-12 overflow-hidden rounded-full ring-1 ring-[#d4af37]/40 shadow-[0_0_25px_-6px_rgba(212,175,55,0.6)]">
+            <img src="/assets/logo.jpeg" alt="Mucamanza Crypto Hub logo" className="h-full w-full object-cover" />
+          </div>
           <div className="leading-tight">
             <div className="text-[10px] uppercase tracking-[0.35em] text-gray-400">Mucamanza</div>
             <div className="bg-gradient-to-r from-[#f3e5ab] via-[#d4af37] to-[#f3e5ab] bg-clip-text text-lg font-bold tracking-wider text-transparent">
@@ -54,8 +49,8 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden items-center gap-8 md:flex">
+        {/* Desktop nav links — always visible on large screens */}
+        <div style={{ display: "flex" }} className="items-center gap-8 max-[768px]:hidden">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -72,8 +67,18 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Auth area (desktop) */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Desktop auth area */}
+        <div style={{ display: "flex" }} className="items-center gap-3 max-[768px]:hidden">
+          {user?.role === "admin" && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 px-4 py-2 text-sm font-semibold text-purple-300 transition hover:border-purple-400 hover:text-purple-200"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Admin Panel
+            </Link>
+          )}
+
           {!user ? (
             <>
               <Link
@@ -100,9 +105,9 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile toggle — only shows below 768px */}
         <button
-          className="rounded-md p-2 text-gray-200 md:hidden"
+          className="rounded-md p-2 text-gray-200 min-[769px]:hidden"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -112,7 +117,7 @@ const Navbar = () => {
 
       {/* Mobile dropdown */}
       {menuOpen && (
-        <div className="border-t border-[#d4af37]/15 bg-[#0d1117]/95 px-4 py-4 md:hidden">
+        <div className="border-t border-[#d4af37]/15 bg-[#0d1117]/95 px-4 py-4 min-[769px]:hidden">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -122,14 +127,27 @@ const Navbar = () => {
               {l.label}
             </Link>
           ))}
+
+          {user?.role === "admin" && (
+            <Link
+              href="/admin"
+              className="mt-2 flex items-center gap-1.5 py-2 text-sm font-semibold text-purple-300"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Admin Panel
+            </Link>
+          )}
+
           <div className="mt-3 flex gap-2">
             {!user ? (
               <>
-                <Link href="/login" className="flex-1 rounded-lg border border-[#d4af37]/30 py-2 text-center text-sm">Login</Link>
+                <Link href="/login" className="flex-1 rounded-lg border border-[#d4af37]/30 py-2 text-center text-sm text-gray-200">Login</Link>
                 <Link href="/signup" className="flex-1 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] py-2 text-center text-sm font-semibold text-black">Sign Up</Link>
               </>
             ) : (
-              <button onClick={handleLogout} className="w-full rounded-lg border border-[#d4af37]/30 py-2 text-sm">Logout</button>
+              <button onClick={handleLogout} className="w-full rounded-lg border border-[#d4af37]/30 py-2 text-sm text-gray-200">
+                Logout
+              </button>
             )}
           </div>
         </div>
