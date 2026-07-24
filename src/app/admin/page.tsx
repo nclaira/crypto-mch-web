@@ -47,12 +47,19 @@ export default function AdminDashboard() {
   const [books, setBooks] = useState<BookType[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState(emptyForm);
+  // Tracks whether localStorage has been read yet — prevents flash redirect
+  const [authReady, setAuthReady] = useState(false);
 
-  // Guard: redirect non-admins
   useEffect(() => {
-    if (user === null) return;
-    if (user.role !== "admin") router.replace("/");
-  }, [user]);
+    // Give localStorage one tick to hydrate the user state
+    setAuthReady(true);
+  }, []);
+
+  // Guard: redirect non-admins only after auth state is ready
+  useEffect(() => {
+    if (!authReady) return;
+    if (!user || user.role !== "admin") router.replace("/login");
+  }, [authReady, user]);
 
   // Fetch data only when confirmed admin
   useEffect(() => {
@@ -60,9 +67,13 @@ export default function AdminDashboard() {
     fetchData();
   }, [user]);
 
-  // ✅ Conditional return AFTER all hooks
-  if (!user || user.role !== "admin") {
-    return null;
+  // Show nothing while auth is still loading from localStorage
+  if (!authReady || !user || user.role !== "admin") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0d1117]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4af37] border-t-transparent" />
+      </div>
+    );
   }
 
   const fetchData = async () => {
