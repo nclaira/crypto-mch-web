@@ -62,7 +62,7 @@ const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium"
           {/* ACTIVE FLUTTERWAVE PAYMENT BUTTON */}
           <div className="mt-7">
             <FlutterwaveButton
-              email={user?.username || "customer@example.com"}
+              email={user?.email || "customer@example.com"}
               name={user?.username || "Customer"}
               amount={5000}
               bookId={resourceName}

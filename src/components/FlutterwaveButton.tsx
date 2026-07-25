@@ -1,6 +1,4 @@
 "use client";
-import React, { useEffect } from "react";
-
 
 interface FlutterwaveProps {
   email: string;
@@ -10,77 +8,72 @@ interface FlutterwaveProps {
   userId: string;
 }
 
+// ✏️ Your Flutterwave public key is read from NEXT_PUBLIC_FLW_PUBLIC_KEY in .env.local
+// Make sure it starts with NEXT_PUBLIC_ so Next.js exposes it to the browser
+const FLW_PUBLIC_KEY = process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY || "";
 
 export default function FlutterwaveButton({ email, amount, name, bookId, userId }: FlutterwaveProps) {
- 
-  // Load Flutterwave inline payment script dynamically
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.flutterwave.com/v3.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
 
   const handlePayment = () => {
+    // Load Flutterwave script if not already loaded
     if (!(window as any).FlutterwaveCheckout) {
-      alert("Flutterwave is still loading... Please try again in a moment.");
-      return;
+      const script = document.createElement("script");
+      script.src = "https://checkout.flutterwave.com/v3.js";
+      script.onload = () => openCheckout();
+      document.body.appendChild(script);
+    } else {
+      openCheckout();
     }
-
-
-    (window as any).FlutterwaveCheckout({
-      public_key: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY,
-      tx_ref: "TX-" + Date.now(),
-      amount: amount,
-      currency: "RWF", // Set currency (e.g. RWF or USD)
-      payment_options: "card, mobilemoneyrwanda",
-      customer: {
-        email: email,
-        name: name,
-      },
-      customizations: {
-        title: "E-Book Store Checkout",
-        description: "Payment for Digital Book Purchase",
-      },
-      callback: async (data: any) => {
-        // Automatically triggered upon payment completion
-        const verifyRes = await fetch("/api/payments/verify-flutterwave", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            transaction_id: data.transaction_id,
-            userId: userId,
-            bookId: bookId,
-            expectedAmount: amount,
-          }),
-        });
-
-
-        const verifyData = await verifyRes.json();
-        if (verifyData.success) {
-          alert("Payment Successful! Your book is unlocked.");
-          window.location.reload();
-        } else {
-          alert("Verification failed: " + verifyData.message);
-        }
-      },
-      onclose: () => {
-        console.log("Payment window closed.");
-      },
-    });
   };
 
+  const openCheckout = () => {
+    (window as any).FlutterwaveCheckout({
+      public_key: FLW_PUBLIC_KEY,
+      tx_ref: "TX-" + Date.now(),
+      amount: amount,
+      currency: "RWF",
+      payment_options: "card,mobilemoneyrwanda",
+      customer: {
+        email: email,   // ← real user email
+        name: name,     // ← real user name
+      },
+      customizations: {
+        title: "Mucamanza Crypto Hub",
+        description: "Payment for Digital Book Purchase",
+        logo: "/assets/logo.jpeg",
+      },
+      callback: async (data: any) => {
+        if (data.status === "successful") {
+          const verifyRes = await fetch("/api/payments/verify-flutterwave", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              transaction_id: data.transaction_id,
+              userId,
+              bookId,
+              expectedAmount: amount,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            alert("Payment Successful! Your account is now unlocked.");
+            window.location.reload();
+          } else {
+            alert("Verification failed: " + verifyData.message);
+          }
+        }
+      },
+      onclose: () => {},
+    });
+  };
 
   return (
     <button
       onClick={handlePayment}
-      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-md"
+      className="w-full rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 font-semibold text-black shadow-lg transition hover:scale-[1.01]"
     >
-      Pay with Mobile Money / Card
+      Unlock Full Access
     </button>
   );
 }

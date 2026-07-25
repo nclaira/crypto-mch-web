@@ -47,14 +47,14 @@ export async function POST(request: Request) {
 
      
 
-        // 8. Prepare a success message
         const response = NextResponse.json({ 
             message: "Login successful!",
-            user: { username: user.username, 
-                    role: user.role,
-                    isPaid: user.isPaid   // to test u change to false or true
-                  }
-
+            user: { 
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                isPaid: user.isPaid
+            }
         });
         
 
