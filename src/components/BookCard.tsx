@@ -1,26 +1,43 @@
 "use client";
-// BookCard — single resource in the Books grid
-// Two tiers: "free" (direct download) | "full" (premium, paywalled)
 
-import { BookOpen, Lock } from "lucide-react";
+import { BookOpen, Lock, Download } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCryptoAuth } from "@/lib/auth";
 import DownloadButton from "@/components/DownloadButton";
 
 export type Book = {
-  id: number;
+  id: number | string;
   title: string;
   author: string;
   tier: "free" | "full";
   cover?: string;
-  fileUrl?: string;   // UploadThing CDN URL — required for free tier downloads
+  fileUrl?: string;   // free preview file
+  pdfUrl?: string;    // full paid file
 };
 
 type Props = {
   book: Book;
-  onAction: (book: Book) => void;  // Called for "full" tier to open paywall
+  onAction: (book: Book) => void; // opens paywall modal
 };
 
 const BookCard = ({ book, onAction }: Props) => {
+  const { user } = useCryptoAuth();
+  const router = useRouter();
   const isFree = book.tier === "free";
+
+  // User has full access if they paid
+  const hasAccess = user?.isPaid === true;
+
+  const handleUnlockClick = () => {
+    // Not logged in → send to login
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    // Logged in but not paid → open paywall/payment modal
+    onAction(book);
+  };
+
   return (
     <div
       className="group rounded-2xl p-[1px] transition hover:-translate-y-1"
@@ -31,6 +48,8 @@ const BookCard = ({ book, onAction }: Props) => {
       }}
     >
       <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-[#0d1117]">
+
+        {/* Cover */}
         <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-black to-[#0f141c]">
           {book.cover ? (
             <img src={book.cover} alt={book.title} className="h-full w-full object-cover" />
@@ -45,27 +64,44 @@ const BookCard = ({ book, onAction }: Props) => {
             {isFree ? "Free Preview" : "Full Access"}
           </span>
         </div>
+
+        {/* Info */}
         <div className="flex flex-1 flex-col p-5">
           <h3 className="font-semibold tracking-wide text-gray-100">{book.title}</h3>
           <p className="mt-1 text-xs uppercase tracking-[0.18em] text-gray-500">by {book.author}</p>
 
           <div className="mt-5">
-            {isFree && book.fileUrl ? (
-              // Free tier — direct Blob download via UploadThing CDN URL
-              <DownloadButton
-                fileUrl={book.fileUrl}
-                title={book.title}
-                label="Download Preview"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#d4af37]/40 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#f3e5ab] transition hover:border-[#d4af37] hover:bg-[#d4af37]/10"
-              />
+            {isFree ? (
+              // Free book — direct download
+              book.fileUrl ? (
+                <DownloadButton
+                  fileUrl={book.fileUrl}
+                  title={book.title}
+                  label="Download Preview"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/40 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300 transition hover:bg-emerald-400/10"
+                />
+              ) : (
+                <span className="text-xs text-gray-500">No file available</span>
+              )
+            ) : hasAccess && book.pdfUrl ? (
+              // Paid user — show download button for the full PDF
+              <a
+                href={book.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-2 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:scale-[1.02]"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download Full PDF
+              </a>
             ) : (
-              // Full tier — opens paywall modal
+              // Not paid or not logged in — show unlock button
               <button
-                onClick={() => onAction(book)}
+                onClick={handleUnlockClick}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#d4af37]/40 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#f3e5ab] transition hover:border-[#d4af37] hover:bg-[#d4af37]/10"
               >
                 <Lock className="h-3.5 w-3.5" />
-                Unlock Full
+                {!user ? "Login to Unlock" : "Unlock Full"}
               </button>
             )}
           </div>

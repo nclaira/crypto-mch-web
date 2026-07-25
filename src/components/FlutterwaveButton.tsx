@@ -1,5 +1,7 @@
 "use client";
 
+import { useCryptoAuth } from "@/lib/auth";
+
 interface FlutterwaveProps {
   email: string;
   amount: number;
@@ -13,6 +15,7 @@ interface FlutterwaveProps {
 const FLW_PUBLIC_KEY = process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY || "";
 
 export default function FlutterwaveButton({ email, amount, name, bookId, userId }: FlutterwaveProps) {
+  const { user, setUser } = useCryptoAuth();
 
   const handlePayment = () => {
     // Load Flutterwave script if not already loaded
@@ -57,6 +60,8 @@ export default function FlutterwaveButton({ email, amount, name, bookId, userId 
           });
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
+            // Update auth context immediately so UI switches to Download button
+            if (user) setUser({ ...user, isPaid: true });
             alert("Payment Successful! Your account is now unlocked.");
             window.location.reload();
           } else {
