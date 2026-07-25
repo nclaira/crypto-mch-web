@@ -23,7 +23,8 @@ export default function BooksPage() {
               title: b.title,
               author: b.author,
               tier: b.accessType === "Free" ? "free" : "full",
-              fileUrl: b.pdfUrl,   // UploadThing CDN URL — passed to DownloadButton
+              fileUrl: b.previewUrl || b.pdfUrl,  // free preview file
+              pdfUrl: b.pdfUrl,                   // full paid file
             }))
           );
         }
@@ -32,11 +33,9 @@ export default function BooksPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Only called for "full" tier books — opens paywall
+  // Only called for logged-in unpaid users — opens paywall
   const handleAction = (book: Book) => {
-    if (!user || !user.isPaid) {
-      setPaywall(book.title);
-    }
+    setPaywall(book.title);
   };
 
   return (
