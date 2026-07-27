@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Sparkles, TrendingUp, ShieldCheck } from "lucide-react";
 import HeroChart from "../components/HeroChart";
 import Footer from "../components/Footer";
 import { downloadBook } from "../lib/api";
-import { useCryptoAuth } from "@/lib/auth"; // Real auth context — no more null placeholder
+import { useCryptoAuth } from "@/lib/auth";
 
 const trendingNews = [
   { id: 1, title: "Bitcoin breaks $100K resistance with record volume", source: "CryptoDaily", time: "2h" },
@@ -17,23 +17,18 @@ const trendingNews = [
 const Home = () => {
   // Read the logged-in user from the global auth context (set after login)
   const { user } = useCryptoAuth();
-  const [paywall, setPaywall] = useState<string | null>(null);
+  const router = useRouter();
 
-  // If user is not logged in, show the paywall modal instead of navigating
   const handlePaid = (name: string) => {
     if (!user) {
-      setPaywall(name);
+      router.push("/login");
       return;
     }
-    window.location.href = "/books";
+    router.push("/books");
   };
 
-  // Try to download a free preview — show paywall if backend blocks it
   const handleFreePreview = async () => {
-    const res = await downloadBook("preview", "mucamanza-preview.pdf");
-    if (!res.ok && (res.status === 401 || res.status === 403)) {
-      setPaywall("Free Preview");
-    }
+    await downloadBook("preview", "mucamanza-preview.pdf");
   };
 
   return (
@@ -183,20 +178,6 @@ const Home = () => {
           Secured by HTTP-Only JWT Sessions
         </p>
       </section>
-
-      {/* Paywall modal — shown when a guest tries to access paid content */}
-      {paywall && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="rounded-2xl border border-[#d4af37]/30 bg-[#0d1117] p-8 text-center max-w-sm">
-            <h2 className="text-lg font-bold text-[#f3e5ab]">Purchase Required</h2>
-            <p className="mt-2 text-sm text-gray-400">You need to purchase access to unlock <strong>{paywall}</strong>.</p>
-            <div className="mt-6 flex gap-3 justify-center">
-              <Link href="/signup" className="rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] px-5 py-2 text-sm font-semibold text-black">Get Access</Link>
-              <button onClick={() => setPaywall(null)} className="rounded-lg border border-white/10 px-5 py-2 text-sm text-gray-300">Close</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>

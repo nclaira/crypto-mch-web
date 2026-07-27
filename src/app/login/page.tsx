@@ -36,7 +36,7 @@ export default function LoginPage() {
     setLoading(true);
 
     // Send email + password to the backend login route
-    const res = await api<{ user: { username: string; role: string; isPaid: boolean } }>(
+    const res = await api<{ user: { username: string; email: string; role: string; isPaid: boolean } }>(
       "/api/auth/login",
       { method: "POST", body: JSON.stringify({ email, password }) },
     );
