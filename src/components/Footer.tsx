@@ -40,7 +40,7 @@ const Footer = () => (
 
           {/* YouTube — paste your YouTube channel URL below */}
           <a
-            href="https://www.youtube.com/@YOUR_CHANNEL_HERE"
+            href="https://youtube.com/@mrcrypto-hub250tradingsn?si=0nf8CYoyeiAs2BzE"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="YouTube"
@@ -53,7 +53,7 @@ const Footer = () => (
 
           {/* Facebook — paste your Facebook page or group URL below */}
           <a
-            href="https://www.facebook.com/YOUR_PAGE_HERE"
+            href="https://www.facebook.com/share/1EADH8gKcG/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
@@ -66,7 +66,7 @@ const Footer = () => (
 
           {/* TikTok — paste your TikTok profile URL below */}
           <a
-            href="https://www.tiktok.com/@YOUR_TIKTOK_HERE"
+            href="https://www.tiktok.com/@cryptomucamanzatrading?_r=1&_t=ZS-98I9wYf9exM"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="TikTok"
@@ -79,7 +79,7 @@ const Footer = () => (
 
           {/* Twitter / X — paste your Twitter/X profile URL below */}
           <a
-            href="https://twitter.com/YOUR_TWITTER_HERE"
+            href="https://x.com/JeanMucung82403"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Twitter / X"
@@ -106,7 +106,7 @@ const Footer = () => (
           {/* WhatsApp — paste your WhatsApp GROUP invite link below */}
           {/* To get your group link: open WhatsApp group > group info > Invite via link > Copy link */}
           <a
-            href="https://chat.whatsapp.com/YOUR_GROUP_INVITE_CODE_HERE"
+            href="https://whatsapp.com/channel/0029Vb6d3WX0AgWKg6kDq91k"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp Group"
