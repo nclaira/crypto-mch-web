@@ -11,8 +11,16 @@ const Navbar = () => {
   const pathname = usePathname();
   const { user, setUser } = useCryptoAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
 
   useEffect(() => setMenuOpen(false), [pathname]);
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const handleLogout = () => {
     setUser(null);
@@ -37,7 +45,7 @@ const Navbar = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-[#d4af37]/40">
             <img src="/assets/logo.jpeg" alt="logo" className="h-full w-full object-cover" />
           </div>
@@ -50,73 +58,79 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop nav links */}
-        <div className="hidden md:flex items-center gap-6 lg:gap-8">
-          {links.map((l) => (
-            <Link
-              key={l.to}
-              href={l.to}
-              className={`relative text-xs lg:text-sm uppercase tracking-[0.15em] transition ${
-                isActive(l.to) ? "text-[#f3e5ab]" : "text-gray-300 hover:text-[#f3e5ab]"
-              }`}
-            >
-              {l.label}
-              {isActive(l.to) && (
-                <span className="absolute -bottom-1 left-0 right-0 mx-auto h-px w-6 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent" />
-              )}
-            </Link>
-          ))}
-        </div>
+        {isDesktop && (
+          <div className="flex items-center gap-6">
+            {links.map((l) => (
+              <Link
+                key={l.to}
+                href={l.to}
+                className={`relative text-sm uppercase tracking-[0.15em] transition ${
+                  isActive(l.to) ? "text-[#f3e5ab]" : "text-gray-300 hover:text-[#f3e5ab]"
+                }`}
+              >
+                {l.label}
+                {isActive(l.to) && (
+                  <span className="absolute -bottom-1 left-0 right-0 mx-auto h-px w-6 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent" />
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* Desktop auth */}
-        <div className="hidden md:flex items-center gap-2">
-          {user?.role === "admin" && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 px-3 py-1.5 text-xs font-semibold text-purple-300 transition hover:border-purple-400"
-            >
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Admin
-            </Link>
-          )}
-          {!user ? (
-            <>
+        {isDesktop && (
+          <div className="flex items-center gap-2">
+            {user?.role === "admin" && (
               <Link
-                href="/login"
-                className="rounded-lg border border-[#d4af37]/30 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
+                href="/admin"
+                className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 px-3 py-1.5 text-xs font-semibold text-purple-300 transition hover:border-purple-400"
               >
-                Login
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Admin
               </Link>
-              <Link
-                href="/signup"
-                className="rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-3 py-1.5 text-xs font-semibold text-black transition hover:scale-[1.03]"
+            )}
+            {!user ? (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-lg border border-[#d4af37]/30 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-3 py-1.5 text-xs font-semibold text-black transition hover:scale-[1.03]"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 rounded-lg border border-[#d4af37]/30 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
               >
-                Sign Up
-              </Link>
-            </>
-          ) : (
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 rounded-lg border border-[#d4af37]/30 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              Logout
-            </button>
-          )}
-        </div>
+                <LogOut className="h-3.5 w-3.5" />
+                Logout
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Mobile hamburger */}
-        <button
-          className="flex md:hidden items-center justify-center rounded-md p-2 text-gray-200 hover:text-[#f3e5ab] transition"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        {!isDesktop && (
+          <button
+            className="rounded-md p-2 text-gray-200 hover:text-[#f3e5ab] transition"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        )}
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden border-t border-[#d4af37]/15 bg-[#0d1117] px-4 pb-5 pt-3">
+      {/* Mobile dropdown */}
+      {!isDesktop && menuOpen && (
+        <div className="border-t border-[#d4af37]/15 bg-[#0d1117] px-4 pb-5 pt-3">
           <div className="flex flex-col gap-1">
             {links.map((l) => (
               <Link
@@ -131,7 +145,6 @@ const Navbar = () => {
                 {l.label}
               </Link>
             ))}
-
             {user?.role === "admin" && (
               <Link
                 href="/admin"
@@ -142,7 +155,6 @@ const Navbar = () => {
               </Link>
             )}
           </div>
-
           <div className="mt-4 flex gap-2">
             {!user ? (
               <>
