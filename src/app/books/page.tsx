@@ -10,7 +10,7 @@ export default function BooksPage() {
   const { user } = useCryptoAuth();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [paywall, setPaywall] = useState<string | null>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/books")
@@ -19,12 +19,13 @@ export default function BooksPage() {
         if (data.success) {
           setBooks(
             data.books.map((b: any) => ({
-              id: b._id,
+              id: b._id,                              // MongoDB _id as string
               title: b.title,
               author: b.author,
               tier: b.accessType === "Free" ? "free" : "full",
-              fileUrl: b.previewUrl || b.pdfUrl,  // free preview file
-              pdfUrl: b.pdfUrl,                   // full paid file
+              fileUrl: b.previewUrl || b.pdfUrl,      // free preview file
+              pdfUrl: b.pdfUrl,                       // full paid file
+              price: b.price,                         // RWF price from admin
             }))
           );
         }
@@ -33,9 +34,9 @@ export default function BooksPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Only called for logged-in unpaid users — opens paywall
+  // Called when a full-tier book's unlock button is clicked
   const handleAction = (book: Book) => {
-    setPaywall(book.title);
+    setSelectedBook(book);
   };
 
   return (
@@ -67,10 +68,11 @@ export default function BooksPage() {
         )}
       </div>
 
+      {/* Pass the full selected book so PaywallModal can read price and id */}
       <PaywallModal
-        open={!!paywall}
-        onClose={() => setPaywall(null)}
-        resourceName={paywall || undefined}
+        open={!!selectedBook}
+        onClose={() => setSelectedBook(null)}
+        book={selectedBook}
       />
 
       <Footer />

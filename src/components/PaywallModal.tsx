@@ -1,22 +1,24 @@
 "use client";
 
 import { Lock, X, ShieldCheck, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import FlutterwaveButton from "@/components/FlutterwaveButton";
+import PaypackButton from "@/components/PaypackButton";
 import { useCryptoAuth } from "@/lib/auth";
+import { Book } from "@/components/BookCard";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  resourceName?: string;
+  book?: Book | null;          // full book object — used from books page
+  resourceName?: string;       // fallback name — used from other pages
 };
 
-const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium" }: Props) => {
+const PaywallModal = ({ open, onClose, book, resourceName }: Props) => {
   const { user } = useCryptoAuth();
-  const router = useRouter();
 
   if (!open) return null;
+
+  const displayName = book?.title || resourceName || "Mucamanza Crypto Premium";
 
   return (
     <div
@@ -30,7 +32,6 @@ const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium"
       >
         <div className="rounded-2xl bg-[#0d1117] p-8 text-center">
 
-          {/* Close button */}
           <button
             onClick={onClose}
             className="absolute right-4 top-4 text-gray-400 hover:text-[#d4af37] transition"
@@ -39,7 +40,6 @@ const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium"
             <X className="h-5 w-5" />
           </button>
 
-          {/* Icon */}
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#d4af37] to-[#8a6d1f] shadow-lg shadow-[#d4af37]/30">
             <Lock className="h-7 w-7 text-black" />
           </div>
@@ -50,8 +50,8 @@ const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium"
 
           <p className="mt-3 text-sm leading-relaxed text-gray-300">
             {user
-              ? <>Purchase <span className="text-[#f3e5ab] font-semibold">{resourceName}</span> to get lifetime PDF access.</>
-              : "You need to log in or create an account before purchasing this book."
+              ? <>Purchase <span className="text-[#f3e5ab] font-semibold">{displayName}</span> to get lifetime PDF access.</>
+              : "You need to log in or create an account before purchasing."
             }
           </p>
 
@@ -63,39 +63,26 @@ const PaywallModal = ({ open, onClose, resourceName = "Mucamanza Crypto Premium"
 
           <div className="mt-7">
             {!user ? (
-              // Not logged in — show login/signup buttons
               <div className="flex gap-3">
-                <Link
-                  href="/login"
-                  onClick={onClose}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 text-sm font-semibold text-black transition hover:scale-[1.01]"
-                >
+                <Link href="/login" onClick={onClose}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 text-sm font-semibold text-black transition hover:scale-[1.01]">
                   Login
                 </Link>
-                <Link
-                  href="/signup"
-                  onClick={onClose}
-                  className="flex-1 rounded-xl border border-[#d4af37]/40 py-3 text-sm font-semibold text-[#f3e5ab] transition hover:border-[#d4af37]"
-                >
+                <Link href="/signup" onClick={onClose}
+                  className="flex-1 rounded-xl border border-[#d4af37]/40 py-3 text-sm font-semibold text-[#f3e5ab] transition hover:border-[#d4af37]">
                   Sign Up
                 </Link>
               </div>
             ) : (
-              // Logged in — show Flutterwave payment button
-              <FlutterwaveButton
-                email={user.email || "customer@example.com"}
-                name={user.username}
-                amount={5000}
-                bookId={resourceName}
-                userId={user.username}
+              <PaypackButton
+                amount={book?.price ?? 5000}
+                bookId={book ? String(book.id) : displayName}
               />
             )}
           </div>
 
-          <button
-            onClick={onClose}
-            className="mt-4 text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-gray-300"
-          >
+          <button onClick={onClose}
+            className="mt-4 text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-gray-300">
             Maybe later
           </button>
         </div>

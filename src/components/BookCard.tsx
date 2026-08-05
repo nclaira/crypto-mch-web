@@ -6,13 +6,14 @@ import { useCryptoAuth } from "@/lib/auth";
 import DownloadButton from "@/components/DownloadButton";
 
 export type Book = {
-  id: number | string;
+  id: string;
   title: string;
   author: string;
   tier: "free" | "full";
   cover?: string;
   fileUrl?: string;   // free preview file
   pdfUrl?: string;    // full paid file
+  price?: number;     // price in RWF — used by Paypack checkout
 };
 
 type Props = {
@@ -69,6 +70,9 @@ const BookCard = ({ book, onAction }: Props) => {
         <div className="flex flex-1 flex-col p-5">
           <h3 className="font-semibold tracking-wide text-gray-100">{book.title}</h3>
           <p className="mt-1 text-xs uppercase tracking-[0.18em] text-gray-500">by {book.author}</p>
+          {!isFree && book.price && (
+            <p className="mt-1 text-sm font-semibold text-[#d4af37]">RWF {book.price.toLocaleString()}</p>
+          )}
 
           <div className="mt-5">
             {isFree ? (
