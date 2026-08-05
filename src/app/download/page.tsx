@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Download, XCircle, Loader2 } from "lucide-react";
@@ -11,7 +11,7 @@ interface BookData {
   price: number;
 }
 
-export default function DownloadPage() {
+function DownloadContent() {
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const bookId = searchParams.get("bookId");
@@ -21,7 +21,6 @@ export default function DownloadPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // If payment wasn't successful or bookId is missing, stop here
     if (status !== "success" || !bookId) {
       setLoading(false);
       return;
@@ -40,7 +39,6 @@ export default function DownloadPage() {
       .finally(() => setLoading(false));
   }, [status, bookId]);
 
-  // ── Loading state ──────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d1117]">
@@ -54,7 +52,6 @@ export default function DownloadPage() {
     );
   }
 
-  // ── Access Denied — bad status or missing bookId ───────────
   if (status !== "success" || !bookId || error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d1117] px-4">
@@ -82,7 +79,6 @@ export default function DownloadPage() {
     );
   }
 
-  // ── Success — show download card ───────────────────────────
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0d1117] px-4">
       <div
@@ -90,22 +86,16 @@ export default function DownloadPage() {
         style={{ backgroundImage: "linear-gradient(135deg,#d4af37,#f3e5ab,#9ca3af,#d4af37)" }}
       >
         <div className="rounded-2xl bg-[#0d1117] p-10 text-center">
-          {/* Green checkmark */}
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 border border-green-500/30">
             <CheckCircle2 className="h-8 w-8 text-green-400" />
           </div>
-
-          <p className="text-xs uppercase tracking-[0.3em] text-[#d4af37]">
-            Payment Confirmed
-          </p>
+          <p className="text-xs uppercase tracking-[0.3em] text-[#d4af37]">Payment Confirmed</p>
           <h1 className="mt-3 text-2xl font-bold bg-gradient-to-r from-[#f3e5ab] via-[#d4af37] to-[#f3e5ab] bg-clip-text text-transparent">
             {book?.title}
           </h1>
           <p className="mt-3 text-sm text-gray-400">
             Your purchase is complete. Click below to download your eBook.
           </p>
-
-          {/* Download button */}
           <a
             href={book?.pdfUrl}
             target="_blank"
@@ -116,7 +106,6 @@ export default function DownloadPage() {
             <Download className="h-4 w-4" />
             Download eBook
           </a>
-
           <Link
             href="/books"
             className="mt-4 inline-block text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-gray-300 transition"
@@ -126,5 +115,13 @@ export default function DownloadPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DownloadPage() {
+  return (
+    <Suspense fallback={<div>Loading download details...</div>}>
+      <DownloadContent />
+    </Suspense>
   );
 }
