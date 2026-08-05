@@ -1,8 +1,8 @@
 // Footer — Mucamanza Crypto Hub
 
 const Footer = () => (
-  <footer className="mt-24 border-t border-[#d4af37]/15 bg-black/60">
-    <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-3">
+  <footer className="mt-16 border-t border-[#d4af37]/15 bg-black/60">
+    <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 md:grid-cols-3">
 
       {/* Brand */}
       <div>

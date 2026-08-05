@@ -41,11 +41,11 @@ export default function BooksPage() {
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-white">
-      <div className="mx-auto max-w-7xl px-4 py-20">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:py-20">
 
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-[#d4af37]">Library</p>
-          <h1 className="mt-3 text-4xl font-bold md:text-5xl">
+          <h1 className="mt-3 text-3xl font-bold sm:text-4xl md:text-5xl">
             <span className="bg-gradient-to-r from-[#f3e5ab] via-[#d4af37] to-[#f3e5ab] bg-clip-text text-transparent">
               Premium Resources
             </span>
@@ -60,7 +60,7 @@ export default function BooksPage() {
         ) : books.length === 0 ? (
           <p className="mt-16 text-center text-gray-400">No books published yet.</p>
         ) : (
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {books.map((book) => (
               <BookCard key={book.id} book={book} onAction={handleAction} />
             ))}

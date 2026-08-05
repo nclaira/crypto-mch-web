@@ -22,15 +22,15 @@ const PaywallModal = ({ open, onClose, book, resourceName }: Props) => {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md rounded-2xl p-[1px] shadow-[0_0_60px_-10px_rgba(212,175,55,0.45)]"
+        className="relative w-full max-w-md rounded-2xl p-[1px] shadow-[0_0_60px_-10px_rgba(212,175,55,0.45)] mx-2 sm:mx-0"
         style={{ backgroundImage: "linear-gradient(135deg,#d4af37,#f3e5ab,#9ca3af,#d4af37)" }}
       >
-        <div className="rounded-2xl bg-[#0d1117] p-8 text-center">
+        <div className="rounded-2xl bg-[#0d1117] p-5 sm:p-8 text-center">
 
           <button
             onClick={onClose}

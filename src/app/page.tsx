@@ -45,12 +45,12 @@ const Home = () => {
             backgroundSize: "26px 26px",
           }}
         />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-20 lg:grid-cols-2 lg:py-28">
-          <div className="flex flex-col justify-center">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/5 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#f3e5ab]">
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:py-20 lg:grid-cols-2 lg:py-28">
+          <div className="flex flex-col justify-center text-center lg:text-left">
+            <span className="inline-flex mx-auto lg:mx-0 w-fit items-center gap-2 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/5 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#f3e5ab]">
               <Sparkles className="h-3 w-3" /> Elite Crypto Architecture
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
+            <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
               <span className="block bg-gradient-to-r from-[#f3e5ab] via-[#d4af37] to-[#f3e5ab] bg-clip-text text-transparent">
                 Mucamanza
               </span>
@@ -63,7 +63,7 @@ const Home = () => {
               Curated knowledge, premium signals, and institutional-grade strategies — all under one luxury roof.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
               <Link
                 href="/categories"
                 className="rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black shadow-[0_15px_40px_-15px_rgba(212,175,55,0.7)] transition hover:scale-[1.02]"
@@ -78,17 +78,17 @@ const Home = () => {
               </Link>
             </div>
 
-            <div className="mt-10 grid grid-cols-3 gap-4 text-center">
+            <div className="mt-10 grid grid-cols-3 gap-2 sm:gap-4 text-center">
               {[
                 { k: "12K+", v: "Active Traders" },
                 { k: "98%", v: "Member Retention" },
                 { k: "24/7", v: "Premium Support" },
               ].map((s) => (
                 <div key={s.v} className="rounded-xl border border-white/5 bg-white/[0.02] py-3">
-                  <div className="bg-gradient-to-r from-[#f3e5ab] to-[#d4af37] bg-clip-text text-xl font-bold text-transparent">
+                  <div className="bg-gradient-to-r from-[#f3e5ab] to-[#d4af37] bg-clip-text text-lg sm:text-xl font-bold text-transparent">
                     {s.k}
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gray-500">{s.v}</div>
+                  <div className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gray-500">{s.v}</div>
                 </div>
               ))}
             </div>
@@ -115,7 +115,7 @@ const Home = () => {
           </Link>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { title: "Crypto Trading", desc: "Institutional strategies, advanced order flow, and live signal architecture.", paid: true },
             { title: "Forex Trading", desc: "Master pairs, macro narratives, risk frameworks and execution.", paid: true },
@@ -152,7 +152,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
             {trendingNews.map((n) => (
               <article
                 key={n.id}

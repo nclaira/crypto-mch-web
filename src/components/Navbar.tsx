@@ -31,65 +31,64 @@ const Navbar = () => {
     to === "/" ? pathname === "/" : pathname?.startsWith(to);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[#d4af37]/15 bg-[#0d1117]/85 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-[#d4af37]/15 bg-[#0d1117]/95 backdrop-blur-xl">
       <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#d4af37]/70 to-transparent" />
 
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
 
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-3 shrink-0">
-          <div className="relative h-12 w-12 overflow-hidden rounded-full ring-1 ring-[#d4af37]/40 shadow-[0_0_25px_-6px_rgba(212,175,55,0.6)]">
-            <img src="/assets/logo.jpeg" alt="Mucamanza Crypto Hub logo" className="h-full w-full object-cover" />
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-[#d4af37]/40">
+            <img src="/assets/logo.jpeg" alt="logo" className="h-full w-full object-cover" />
           </div>
           <div className="leading-tight">
-            <div className="text-[10px] uppercase tracking-[0.35em] text-gray-400">Mucamanza</div>
-            <div className="bg-gradient-to-r from-[#f3e5ab] via-[#d4af37] to-[#f3e5ab] bg-clip-text text-lg font-bold tracking-wider text-transparent">
+            <div className="text-[9px] uppercase tracking-[0.3em] text-gray-400">Mucamanza</div>
+            <div className="bg-gradient-to-r from-[#f3e5ab] via-[#d4af37] to-[#f3e5ab] bg-clip-text text-sm font-bold tracking-wider text-transparent">
               CRYPTO HUB
             </div>
           </div>
         </Link>
 
-        {/* Desktop nav links — always visible on large screens */}
-        <div style={{ display: "flex" }} className="items-center gap-8 max-[768px]:hidden">
+        {/* Desktop nav links */}
+        <div className="hidden md:flex items-center gap-6 lg:gap-8">
           {links.map((l) => (
             <Link
               key={l.to}
               href={l.to}
-              className={`relative text-sm uppercase tracking-[0.18em] transition ${
+              className={`relative text-xs lg:text-sm uppercase tracking-[0.15em] transition ${
                 isActive(l.to) ? "text-[#f3e5ab]" : "text-gray-300 hover:text-[#f3e5ab]"
               }`}
             >
               {l.label}
               {isActive(l.to) && (
-                <span className="absolute -bottom-2 left-0 right-0 mx-auto h-px w-8 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent" />
+                <span className="absolute -bottom-1 left-0 right-0 mx-auto h-px w-6 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent" />
               )}
             </Link>
           ))}
         </div>
 
-        {/* Desktop auth area */}
-        <div style={{ display: "flex" }} className="items-center gap-3 max-[768px]:hidden">
+        {/* Desktop auth */}
+        <div className="hidden md:flex items-center gap-2">
           {user?.role === "admin" && (
             <Link
               href="/admin"
-              className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 px-4 py-2 text-sm font-semibold text-purple-300 transition hover:border-purple-400 hover:text-purple-200"
+              className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 px-3 py-1.5 text-xs font-semibold text-purple-300 transition hover:border-purple-400"
             >
-              <ShieldCheck className="h-4 w-4" />
-              Admin Panel
+              <ShieldCheck className="h-3.5 w-3.5" />
+              Admin
             </Link>
           )}
-
           {!user ? (
             <>
               <Link
                 href="/login"
-                className="rounded-lg border border-[#d4af37]/30 px-4 py-2 text-sm font-medium tracking-wide text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
+                className="rounded-lg border border-[#d4af37]/30 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-4 py-2 text-sm font-semibold tracking-wide text-black shadow-[0_8px_25px_-10px_rgba(212,175,55,0.7)] transition hover:scale-[1.03]"
+                className="rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-3 py-1.5 text-xs font-semibold text-black transition hover:scale-[1.03]"
               >
                 Sign Up
               </Link>
@@ -97,55 +96,65 @@ const Navbar = () => {
           ) : (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 rounded-lg border border-[#d4af37]/30 px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
+              className="flex items-center gap-1.5 rounded-lg border border-[#d4af37]/30 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-[#d4af37] hover:text-[#f3e5ab]"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3.5 w-3.5" />
               Logout
             </button>
           )}
         </div>
 
-        {/* Mobile toggle — only shows below 768px */}
+        {/* Mobile hamburger */}
         <button
-          className="rounded-md p-2 text-gray-200 min-[769px]:hidden"
+          className="flex md:hidden items-center justify-center rounded-md p-2 text-gray-200 hover:text-[#f3e5ab] transition"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
-          {menuOpen ? <X /> : <Menu />}
+          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-[#d4af37]/15 bg-[#0d1117]/95 px-4 py-4 min-[769px]:hidden">
-          {links.map((l) => (
-            <Link
-              key={l.to}
-              href={l.to}
-              className="block py-2 text-sm uppercase tracking-[0.18em] text-gray-300 hover:text-[#f3e5ab]"
-            >
-              {l.label}
-            </Link>
-          ))}
+        <div className="md:hidden border-t border-[#d4af37]/15 bg-[#0d1117] px-4 pb-5 pt-3">
+          <div className="flex flex-col gap-1">
+            {links.map((l) => (
+              <Link
+                key={l.to}
+                href={l.to}
+                className={`rounded-lg px-3 py-2.5 text-sm uppercase tracking-[0.15em] transition ${
+                  isActive(l.to)
+                    ? "bg-[#d4af37]/10 text-[#f3e5ab]"
+                    : "text-gray-300 hover:bg-white/5 hover:text-[#f3e5ab]"
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
 
-          {user?.role === "admin" && (
-            <Link
-              href="/admin"
-              className="mt-2 flex items-center gap-1.5 py-2 text-sm font-semibold text-purple-300"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              Admin Panel
-            </Link>
-          )}
+            {user?.role === "admin" && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-purple-300 hover:bg-white/5 transition"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin Panel
+              </Link>
+            )}
+          </div>
 
-          <div className="mt-3 flex gap-2">
+          <div className="mt-4 flex gap-2">
             {!user ? (
               <>
-                <Link href="/login" className="flex-1 rounded-lg border border-[#d4af37]/30 py-2 text-center text-sm text-gray-200">Login</Link>
-                <Link href="/signup" className="flex-1 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f3e5ab] py-2 text-center text-sm font-semibold text-black">Sign Up</Link>
+                <Link href="/login" className="flex-1 rounded-xl border border-[#d4af37]/30 py-2.5 text-center text-sm font-medium text-gray-200 hover:border-[#d4af37] transition">
+                  Login
+                </Link>
+                <Link href="/signup" className="flex-1 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-2.5 text-center text-sm font-semibold text-black transition">
+                  Sign Up
+                </Link>
               </>
             ) : (
-              <button onClick={handleLogout} className="w-full rounded-lg border border-[#d4af37]/30 py-2 text-sm text-gray-200">
+              <button onClick={handleLogout} className="w-full rounded-xl border border-[#d4af37]/30 py-2.5 text-sm text-gray-200 hover:border-[#d4af37] transition">
                 Logout
               </button>
             )}
