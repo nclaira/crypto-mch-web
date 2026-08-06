@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Download, XCircle, Loader2 } from "lucide-react";
+import { useCryptoAuth } from "@/lib/auth";
 
 interface BookData {
   title: string;
@@ -15,6 +16,7 @@ function DownloadContent() {
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const bookId = searchParams.get("bookId");
+  const { user, setUser } = useCryptoAuth();
 
   const [book, setBook] = useState<BookData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,17 +28,40 @@ function DownloadContent() {
       return;
     }
 
-    fetch("/api/books/" + bookId)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) {
-          setBook({ title: data.title, pdfUrl: data.pdfUrl, price: data.price });
-        } else {
+    const run = async () => {
+      try {
+        // 1. Fetch book details
+        const bookRes = await fetch("/api/books/" + bookId);
+        const bookData = await bookRes.json();
+
+        if (!bookData.success) {
           setError("Could not load book details.");
+          return;
         }
-      })
-      .catch(() => setError("Network error. Please try again."))
-      .finally(() => setLoading(false));
+
+        setBook({ title: bookData.title, pdfUrl: bookData.pdfUrl, price: bookData.price });
+
+        // 2. Mark user as paid in MongoDB
+        await fetch("/api/payments/confirm", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookId }),
+        });
+
+        // 3. Update auth context so BookCard shows download button immediately
+        if (user) {
+          setUser({ ...user, isPaid: true });
+        }
+
+      } catch {
+        setError("Network error. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
   }, [status, bookId]);
 
   if (loading) {
@@ -120,7 +145,7 @@ function DownloadContent() {
 
 export default function DownloadPage() {
   return (
-    <Suspense fallback={<div>Loading download details...</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#0d1117]"><Loader2 className="h-8 w-8 animate-spin text-[#d4af37]" /></div>}>
       <DownloadContent />
     </Suspense>
   );

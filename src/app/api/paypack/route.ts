@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const { phone, amount } = await request.json();
 
+  console.log("Paypack cashin attempt:", { phone, amount });
+
   // 1. Authenticate
   const authRes = await fetch("https://payments.paypack.rw/api/auth/agents/authorize", {
     method: "POST",
@@ -14,14 +16,15 @@ export async function POST(request: NextRequest) {
   });
 
   const authData = await authRes.json();
+  console.log("Paypack auth response:", authData);
+
   const access_token = authData?.access;
 
   if (!access_token) {
-    console.error("Paypack auth failed:", authData);
-    return NextResponse.json({ success: false, error: "Authentication failed" }, { status: 400 });
+    return NextResponse.json({ success: false, error: "Authentication failed: " + JSON.stringify(authData) }, { status: 400 });
   }
 
-  // 2. Cashin
+  // 2. Trigger cashin
   const cashinRes = await fetch("https://payments.paypack.rw/api/transactions/cashin", {
     method: "POST",
     headers: {
@@ -32,14 +35,17 @@ export async function POST(request: NextRequest) {
   });
 
   const cashinData = await cashinRes.json();
+  console.log("Paypack cashin response:", cashinData);
 
   if (!cashinRes.ok) {
-    console.error("Paypack cashin failed:", cashinData);
     return NextResponse.json(
-      { success: false, error: cashinData.message || "Payment trigger failed" },
+      { success: false, error: cashinData.message || JSON.stringify(cashinData) },
       { status: 400 }
     );
   }
 
-  return NextResponse.json({ success: true, data: cashinData });
+  return NextResponse.json({
+    success: true,
+    ref: cashinData.ref,
+  });
 }
