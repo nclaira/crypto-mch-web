@@ -53,7 +53,8 @@ export async function POST(request: Request) {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                isPaid: user.isPaid
+                isPaid: user.isPaid,
+                purchasedBookIds: user.purchasedBookIds || []
             }
         });
         

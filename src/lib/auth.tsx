@@ -18,9 +18,10 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 // Shape of the logged-in user object returned by /api/auth/login
 export interface AuthUser {
   username: string;
-  email: string;    // needed for Flutterwave payment
-  role: string;     // "user" | "admin"
-  isPaid: boolean;  // true = can download full books
+  email: string;
+  role: string;
+  isPaid: boolean;
+  purchasedBookIds: string[];
 }
 
 // Shape of what the context exposes to every component

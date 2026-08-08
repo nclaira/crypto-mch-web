@@ -31,9 +31,8 @@ const UserSchema = new mongoose.Schema({
         default: false // Everyone starts as a free user until they buy a subscription
     },
 
-    // 🆕 LIST OF PURCHASED BOOKS/VIDEOS
-    purchasedBooks: [{
-        type: String   // Stores IDs or titles of unlocked resources
+    purchasedBookIds: [{
+        type: String
     }],
 
     createdAt: {

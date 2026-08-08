@@ -26,8 +26,8 @@ const BookCard = ({ book, onAction }: Props) => {
   const router = useRouter();
   const isFree = book.tier === "free";
 
-  // User has full access if they paid
-  const hasAccess = user?.isPaid === true;
+  // User has access to THIS specific book
+  const hasAccess = user?.purchasedBookIds?.includes(String(book.id)) || user?.role === "admin";
 
   const handleUnlockClick = () => {
     // Not logged in → send to login

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useCryptoAuth } from "@/lib/auth";
 
 interface PaypackProps {
   amount: number;
@@ -11,6 +12,7 @@ interface PaypackProps {
 
 export default function PaypackButton({ amount, bookId }: PaypackProps) {
   const router = useRouter();
+  const { user, setUser } = useCryptoAuth();
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [polling, setPolling] = useState(false);
@@ -21,59 +23,55 @@ export default function PaypackButton({ amount, bookId }: PaypackProps) {
       setError("Please enter a valid MoMo phone number.");
       return;
     }
-
     setLoading(true);
     setError("");
 
     try {
-      // 1. Trigger the MoMo prompt on the user's phone
       const res = await fetch("/api/paypack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, amount }),
+        body: JSON.stringify({ phone, amount, bookId }),
       });
-
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        // Show the exact error from Paypack so we can diagnose it
-        setError(data.error || `Error ${res.status}: Payment failed.`);
+        setError(data.error || "Payment failed. Please try again.");
         setLoading(false);
         return;
       }
 
-      // 2. Prompt sent — now poll until user enters their PIN
       setLoading(false);
       setPolling(true);
       pollStatus(data.ref);
-
     } catch {
       setError("Network error. Please try again.");
       setLoading(false);
     }
   };
 
-  // Poll /api/paypack/status every 3 seconds up to 20 times (1 minute)
   const pollStatus = (ref: string) => {
     let attempts = 0;
-    const maxAttempts = 20;
-
     const interval = setInterval(async () => {
       attempts++;
-
       try {
         const res = await fetch("/api/paypack/status", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ref }),
         });
-
         const data = await res.json();
 
         if (data.paid) {
-          // Payment confirmed — go to download page
           clearInterval(interval);
           setPolling(false);
+          // Update context — add this bookId to purchasedBookIds
+          if (user) {
+            const updated = {
+              ...user,
+              purchasedBookIds: [...(user.purchasedBookIds || []), bookId],
+            };
+            setUser(updated);
+          }
           router.push(`/download?status=success&bookId=${bookId}`);
           return;
         }
@@ -84,23 +82,20 @@ export default function PaypackButton({ amount, bookId }: PaypackProps) {
           setError("Payment was declined. Please try again.");
           return;
         }
-
       } catch {
-        // Network hiccup — keep polling
+        // keep polling on network hiccup
       }
 
-      // Timed out after 1 minute
-      if (attempts >= maxAttempts) {
+      if (attempts >= 20) {
         clearInterval(interval);
         setPolling(false);
         setError("Payment timed out. If you paid, please contact support.");
       }
-    }, 3000); // check every 3 seconds
+    }, 3000);
   };
 
   return (
     <div className="flex w-full flex-col gap-3">
-      {/* Phone input — hidden while polling */}
       {!polling && (
         <input
           type="tel"
@@ -112,30 +107,26 @@ export default function PaypackButton({ amount, bookId }: PaypackProps) {
         />
       )}
 
-      {/* Error message */}
       {error && <p className="text-xs text-red-400">{error}</p>}
 
-      {/* Polling state — waiting for user to enter PIN */}
       {polling ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border border-[#d4af37]/30 bg-[#d4af37]/5 p-4">
           <Loader2 className="h-6 w-6 animate-spin text-[#d4af37]" />
           <p className="text-sm font-semibold text-[#f3e5ab]">Waiting for payment...</p>
-          <p className="text-xs text-gray-400 text-center">
-            Check your phone and enter your MoMo PIN to confirm the payment of{" "}
-            <span className="text-white font-semibold">RWF {amount.toLocaleString()}</span>.
+          <p className="text-xs text-center text-gray-400">
+            Enter your MoMo PIN to confirm{" "}
+            <span className="font-semibold text-white">RWF {amount.toLocaleString()}</span>.
           </p>
         </div>
       ) : (
         <button
           onClick={handlePayment}
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 font-semibold text-black shadow-lg shadow-[#d4af37]/20 transition hover:scale-[1.01] disabled:opacity-60"
+          className="w-full rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 font-semibold text-black shadow-lg transition hover:scale-[1.01] disabled:opacity-60"
         >
           {loading
-            ? <span className="flex items-center justify-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Sending to phone...
-              </span>
-            : `Pay RWF ${amount.toLocaleString()}`
+            ? <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Sending to phone...</span>
+            : `Pay Now — RWF ${amount.toLocaleString()}`
           }
         </button>
       )}
