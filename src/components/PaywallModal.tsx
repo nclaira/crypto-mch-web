@@ -50,14 +50,14 @@ const PaywallModal = ({ open, onClose, book, resourceName }: Props) => {
 
           <p className="mt-3 text-sm leading-relaxed text-gray-300">
             {user
-              ? <>Purchase <span className="text-[#f3e5ab] font-semibold">{displayName}</span> to get lifetime PDF access.</>
+              ? <>Purchase <span className="text-[#f3e5ab] font-semibold">{displayName}</span> to get lifetime pdf access.</>
               : "You need to log in or create an account before purchasing."
             }
           </p>
 
           <ul className="mt-5 space-y-2 text-left text-sm text-gray-300">
             <li className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-[#d4af37]" /> Full Crypto & Forex eBooks</li>
-            <li className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#d4af37]" /> Lifetime PDF downloads</li>
+            <li className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#d4af37]" /> lifetime pdf downloads</li>
             <li className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-[#d4af37]" /> Premium signal community</li>
           </ul>
 

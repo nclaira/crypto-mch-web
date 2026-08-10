@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/db";
+import { User } from "@/models/user";
 
 export async function POST(request: NextRequest) {
-  const { ref } = await request.json();
+  const { ref, bookId, username } = await request.json();
 
   if (!ref) {
     return NextResponse.json({ success: false, error: "Missing ref" }, { status: 400 });
   }
 
-  // 1. Authenticate
+  // 1. Authenticate with Paypack
   const authRes = await fetch("https://payments.paypack.rw/api/auth/agents/authorize", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,18 +40,29 @@ export async function POST(request: NextRequest) {
   const eventsData = await eventsRes.json();
   const transactions = eventsData?.transactions ?? [];
 
-  // Find the processed event matching our ref
   const match = transactions.find(
     (t: any) => t.data?.ref === ref && t.event_kind === "transaction:processed"
   );
 
   if (!match) {
-    // Not processed yet — still pending
     return NextResponse.json({ success: true, paid: false, status: "pending" });
   }
 
   const status = match.data?.status;
   const paid = status === "successful";
+
+  // 3. If paid, permanently save bookId to user's purchasedBookIds in DB
+  if (paid && bookId && username) {
+    try {
+      await connectDB();
+      await User.findOneAndUpdate(
+        { username },
+        { $addToSet: { purchasedBookIds: bookId } }
+      );
+    } catch (err) {
+      console.error("Failed to save purchasedBookId:", err);
+    }
+  }
 
   return NextResponse.json({ success: true, paid, status });
 }

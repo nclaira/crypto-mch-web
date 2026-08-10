@@ -57,7 +57,7 @@ export default function PaypackButton({ amount, bookId }: PaypackProps) {
         const res = await fetch("/api/paypack/status", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ref }),
+          body: JSON.stringify({ ref, bookId, username: user?.username }),
         });
         const data = await res.json();
 
@@ -99,13 +99,15 @@ export default function PaypackButton({ amount, bookId }: PaypackProps) {
       {!polling && (
         <input
           type="tel"
-          placeholder="MoMo number e.g. 078XXXXXXX"
+          placeholder="Number Has Money e.g. 07XXXXXXXX"
           value={phone}
           onChange={(e) => { setPhone(e.target.value); setError(""); }}
           disabled={loading}
           className="w-full rounded-xl border border-gray-700 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] disabled:opacity-50"
         />
       )}
+
+
 
       {error && <p className="text-xs text-red-400">{error}</p>}
 
