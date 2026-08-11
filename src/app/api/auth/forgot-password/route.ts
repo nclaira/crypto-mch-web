@@ -4,8 +4,6 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/user";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
@@ -14,10 +12,8 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const user = await User.findOne({ email: email.toLowerCase() });
 
-    // Always return success to prevent email enumeration attacks
     if (!user) return NextResponse.json({ success: true });
 
-    // Generate secure random token valid for 1 hour
     const token = crypto.randomBytes(32).toString("hex");
     const expiry = new Date(Date.now() + 60 * 60 * 1000);
 
@@ -26,7 +22,16 @@ export async function POST(request: NextRequest) {
       resetTokenExpiry: expiry,
     });
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+    const origin = request.headers.get("origin") 
+      || request.headers.get("x-forwarded-host")
+      || process.env.NEXT_PUBLIC_APP_URL 
+      || "https://crypto-mch-web.vercel.app";
+
+    const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+
+    // Initialize Resend inside the function to avoid build-time errors
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
       from: "onboarding@resend.dev",
