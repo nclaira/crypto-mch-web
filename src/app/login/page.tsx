@@ -128,6 +128,9 @@ export default function LoginPage() {
             No account?{" "}
             <Link href="/signup" className="text-[#f3e5ab] hover:underline">Create one</Link>
           </p>
+          <p className="text-center text-xs text-gray-500">
+            <Link href="/forgot-password" className="text-[#d4af37] hover:underline">Forgot password?</Link>
+          </p>
         </form>
       </div>
     </div>

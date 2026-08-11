@@ -35,6 +35,9 @@ const UserSchema = new mongoose.Schema({
         type: String
     }],
 
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
+
     createdAt: {
         type: Date,
         default: Date.now // Automatically logs the exact date and time they registered
