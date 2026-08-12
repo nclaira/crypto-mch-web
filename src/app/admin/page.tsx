@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, PlusCircle, Users, BookOpen, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Trash2, PlusCircle, Users, BookOpen, ShieldCheck, CheckCircle2, Pencil, X } from "lucide-react";
 import Footer from "@/components/Footer";
 import { UploadButton } from "@/lib/uploadthing";
 import { useCryptoAuth } from "@/lib/auth";
@@ -24,6 +24,9 @@ interface BookType {
   accessType: string;
   price: number;
   type: string;
+  description?: string;
+  previewUrl?: string;
+  pdfUrl?: string;
 }
 
 const emptyForm = {
@@ -39,42 +42,27 @@ const emptyForm = {
 };
 
 export default function AdminDashboard() {
-  // ✅ ALL hooks must be at the top — before any conditional return
-  const { user } = useCryptoAuth();
+  const { user, ready } = useCryptoAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"users" | "books">("users");
   const [users, setUsers] = useState<UserType[]>([]);
   const [books, setBooks] = useState<BookType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
-  // Tracks whether localStorage has been read yet — prevents flash redirect
-  const [authReady, setAuthReady] = useState(false);
+  const [editingBook, setEditingBook] = useState<BookType | null>(null);
 
+  // Guard: redirect non-admins only after auth has hydrated from localStorage
   useEffect(() => {
-    // Give localStorage one tick to hydrate the user state
-    setAuthReady(true);
-  }, []);
-
-  // Guard: redirect non-admins only after auth state is ready
-  useEffect(() => {
-    if (!authReady) return;
+    if (!ready) return;
     if (!user || user.role !== "admin") router.replace("/login");
-  }, [authReady, user]);
+  }, [ready, user, router]);
 
   // Fetch data only when confirmed admin
   useEffect(() => {
-    if (!user || user.role !== "admin") return;
+    if (!ready || !user || user.role !== "admin") return;
     fetchData();
-  }, [user]);
-
-  // Show nothing while auth is still loading from localStorage
-  if (!authReady || !user || user.role !== "admin") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0d1117]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4af37] border-t-transparent" />
-      </div>
-    );
-  }
+  }, [ready, user]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -94,6 +82,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEditBook = (b: BookType) => {
+    setEditingBook(b);
+    setFormData({
+      title: b.title,
+      author: b.author,
+      category: b.category || "Crypto Trading",
+      accessType: b.accessType,
+      price: b.price,
+      type: b.type,
+      description: b.description || "",
+      previewUrl: b.previewUrl || "",
+      pdfUrl: b.pdfUrl || "",
+    });
+    setActiveTab("books");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingBook(null);
+    setFormData(emptyForm);
+  };
+
   const handleDeleteUser = async (userId: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -104,7 +114,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ userId }),
       });
       const data = await res.json();
-      if (data.success) setUsers(users.filter((u) => u._id !== userId));
+      if (data.success) setUsers((prev) => prev.filter((u) => u._id !== userId));
       else alert(data.error || "Failed to delete user");
     } catch {
       alert("Error deleting user");
@@ -121,16 +131,35 @@ export default function AdminDashboard() {
         body: JSON.stringify({ bookId }),
       });
       const data = await res.json();
-      if (data.success) setBooks(books.filter((b) => b._id !== bookId));
+      if (data.success) setBooks((prev) => prev.filter((b) => b._id !== bookId));
       else alert(data.error || "Failed to delete item");
     } catch {
       alert("Error deleting item");
     }
   };
 
-  const handleCreateBook = async (e: React.FormEvent) => {
+  const handleSubmitBook = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     try {
+      if (editingBook) {
+        const res = await fetch(`/api/admin/books/${editingBook._id}`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setBooks((prev) => prev.map((b) => (b._id === editingBook._id ? data.book : b)));
+          setEditingBook(null);
+          setFormData(emptyForm);
+        } else {
+          alert(data.error || "Failed to update item");
+        }
+        return;
+      }
+
       const res = await fetch("/api/admin/books", {
         method: "POST",
         credentials: "include",
@@ -140,15 +169,26 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (data.success) {
         alert("Resource published successfully!");
-        setBooks([data.book, ...books]);
+        setBooks((prev) => [data.book, ...prev]);
         setFormData(emptyForm);
       } else {
-        alert("Error publishing resource");
+        alert(data.error || "Error publishing resource");
       }
     } catch {
       alert("Error connecting to server");
+    } finally {
+      setSaving(false);
     }
   };
+
+  // Show spinner until auth hydrates — prevents false redirect / empty-data flash
+  if (!ready || !user || user.role !== "admin") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0d1117]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d4af37] border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-white">
@@ -262,9 +302,14 @@ export default function AdminDashboard() {
           <div className="mt-8 grid gap-8 lg:grid-cols-3">
             <div className="rounded-2xl border border-[#d4af37]/20 bg-[#161b22] p-6 shadow-xl lg:col-span-1">
               <h2 className="text-xl font-bold text-[#f3e5ab] mb-4 flex items-center gap-2">
-                <PlusCircle className="h-5 w-5 text-[#d4af37]" /> Upload New Item
+                {editingBook ? (
+                  <Pencil className="h-5 w-5 text-[#d4af37]" />
+                ) : (
+                  <PlusCircle className="h-5 w-5 text-[#d4af37]" />
+                )}
+                {editingBook ? "Edit Item" : "Upload New Item"}
               </h2>
-              <form onSubmit={handleCreateBook} className="space-y-4">
+              <form onSubmit={handleSubmitBook} className="space-y-4">
                 <div>
                   <label className="text-xs text-gray-400 uppercase">Title</label>
                   <input type="text" required value={formData.title}
@@ -306,32 +351,52 @@ export default function AdminDashboard() {
                     className="mt-1 w-full rounded-xl border border-gray-700 bg-[#0d1117] p-3 text-sm text-white focus:border-[#d4af37] focus:outline-none" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 uppercase">Upload File (PDF or Video)</label>
+                  <label className="text-xs text-gray-400 uppercase">File URL</label>
+                  <input type="url" value={formData.pdfUrl}
+                    onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+                    className="mt-1 w-full rounded-xl border border-gray-700 bg-[#0d1117] p-3 text-sm text-white focus:border-[#d4af37] focus:outline-none"
+                    placeholder="https://... or upload below" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 uppercase">
+                    {editingBook ? "Replace File (optional)" : "Upload File (PDF or Video)"}
+                  </label>
                   <div className="mt-1 rounded-xl border border-gray-700 bg-[#0d1117] p-3">
                     <UploadButton
                       endpoint="docUploader"
                       onClientUploadComplete={(res) => {
-                        if (res?.[0]?.url) setFormData({ ...formData, pdfUrl: res[0].url });
+                        if (res?.[0]?.url) setFormData((prev) => ({ ...prev, pdfUrl: res[0].url }));
                       }}
                       onUploadError={(error) => alert(`Upload failed: ${error.message}`)}
                     />
                     {formData.pdfUrl && (
-                      <p className="mt-2 flex items-center gap-1.5 text-xs text-green-400">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> File Ready to Publish
+                      <p className="mt-2 flex items-center gap-1.5 text-xs text-green-400 break-all">
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                        {editingBook ? "File linked" : "File Ready to Publish"}
                       </p>
                     )}
                   </div>
                 </div>
-                <button type="submit"
-                  className="w-full rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 font-semibold text-black shadow-lg shadow-[#d4af37]/20 hover:scale-[1.01] transition">
-                  Publish to Library
+                <button type="submit" disabled={saving}
+                  className="w-full rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] py-3 font-semibold text-black shadow-lg shadow-[#d4af37]/20 hover:scale-[1.01] transition disabled:opacity-60">
+                  {saving
+                    ? (editingBook ? "Updating..." : "Publishing...")
+                    : (editingBook ? "Update Item" : "Publish to Library")}
                 </button>
+                {editingBook && (
+                  <button type="button" onClick={handleCancelEdit}
+                    className="w-full rounded-xl border border-gray-600 py-3 text-sm font-semibold text-gray-300 hover:border-gray-400 transition flex items-center justify-center gap-2">
+                    <X className="h-4 w-4" /> Cancel Edit
+                  </button>
+                )}
               </form>
             </div>
 
             <div className="rounded-2xl border border-[#d4af37]/20 bg-[#161b22] p-6 shadow-xl lg:col-span-2">
               <h2 className="text-xl font-bold text-[#f3e5ab] mb-4">Published Library Content</h2>
-              {books.length === 0 ? (
+              {loading ? (
+                <p className="text-gray-400 text-sm">Loading library...</p>
+              ) : books.length === 0 ? (
                 <p className="text-gray-400 text-sm">No items published yet.</p>
               ) : (
                 <div className="space-y-4">
@@ -348,13 +413,22 @@ export default function AdminDashboard() {
                           By {b.author} • {b.accessType} • {b.price} RWF
                         </p>
                       </div>
-                      <button
-                        onClick={() => handleDeleteBook(b._id)}
-                        className="rounded-lg p-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition"
-                        title="Delete Item"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleEditBook(b)}
+                          className="rounded-lg p-2 text-[#d4af37] hover:bg-[#d4af37]/10 transition"
+                          title="Edit Item"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteBook(b._id)}
+                          className="rounded-lg p-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition"
+                          title="Delete Item"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
