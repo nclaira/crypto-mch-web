@@ -46,8 +46,10 @@ const Home = () => {
           }}
         />
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:py-20 lg:grid-cols-2 lg:py-28">
-          <div className="flex flex-col justify-center text-center lg:text-left">
-            <span className="inline-flex mx-auto lg:mx-0 w-fit items-center gap-2 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/5 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#f3e5ab]">
+          
+          {/* Left Hero Content */}
+          <div className="flex flex-col items-start text-left">
+            <span className="inline-flex w-fit gap-2 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/5 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#f3e5ab]">
               <Sparkles className="h-3 w-3" /> Elite Crypto Architecture
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
@@ -63,7 +65,8 @@ const Home = () => {
               Curated knowledge, premium signals, and institutional-grade strategies — all under one luxury roof.
             </p>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+            {/* Action Buttons - Aligned Left */}
+            <div className="mt-8 flex flex-wrap justify-start gap-3">
               <Link
                 href="/categories"
                 className="rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-[#d4af37] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black shadow-[0_15px_40px_-15px_rgba(212,175,55,0.7)] transition hover:scale-[1.02]"
@@ -78,13 +81,14 @@ const Home = () => {
               </Link>
             </div>
 
-            <div className="mt-10 grid grid-cols-3 gap-2 sm:gap-4 text-center">
+            {/* Stats Bar - Aligned Left */}
+            <div className="mt-10 grid w-full grid-cols-3 gap-2 sm:gap-4 text-left">
               {[
                 { k: "12K+", v: "Active Traders" },
                 { k: "98%", v: "Member Retention" },
                 { k: "24/7", v: "Premium Support" },
               ].map((s) => (
-                <div key={s.v} className="rounded-xl border border-white/5 bg-white/[0.02] py-3">
+                <div key={s.v} className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                   <div className="bg-gradient-to-r from-[#f3e5ab] to-[#d4af37] bg-clip-text text-lg sm:text-xl font-bold text-transparent">
                     {s.k}
                   </div>
@@ -94,6 +98,7 @@ const Home = () => {
             </div>
           </div>
 
+          {/* Right Hero Visual */}
           <div className="flex items-center justify-center">
             <HeroChart />
           </div>
