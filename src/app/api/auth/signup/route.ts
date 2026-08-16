@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/user";
+import { sendWelcomeEmail } from "@/lib/email/welcome";
 import bcrypt from "bcryptjs";
 
 
@@ -39,7 +40,21 @@ export async function POST(request: Request) {
         // 7. Save it to your computer's local MongoDB database
         await newAccount.save();
 
-        // 8. Send back a clean success message
+        // 8. Send welcome email (non-blocking — registration still succeeds if this fails)
+        const origin =
+          request.headers.get("origin") ||
+          request.headers.get("x-forwarded-host") ||
+          process.env.NEXT_PUBLIC_APP_URL ||
+          "https://crypto-mch-web.vercel.app";
+        const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
+
+        await sendWelcomeEmail({
+          to: email,
+          username,
+          loginUrl: `${baseUrl.replace(/\/$/, "")}/login`,
+        });
+
+        // 9. Send back a clean success message
         return NextResponse.json({ message: "Account created successfully!" }, { status: 201 });
 
     } catch (error) {
