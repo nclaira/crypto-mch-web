@@ -36,7 +36,7 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams): Promise<void
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const from = process.env.RESEND_FROM_EMAIL || "Mucamanza Crypto Hub <hello@mucamanzacryptohub.com>";
 
     await resend.emails.send({
       from,
@@ -48,6 +48,8 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams): Promise<void
     console.error("Welcome email failed:", error);
   }
 }
+
+
 
 function escapeHtml(value: string): string {
   return value

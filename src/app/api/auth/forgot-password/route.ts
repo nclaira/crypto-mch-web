@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: process.env.RESEND_FROM_EMAIL || "Mucamanza Crypto Hub <hello@mucamanzacryptohub.com>",
       to: email,
       subject: "Reset your password — Mucamanza Crypto Hub",
       html: `
