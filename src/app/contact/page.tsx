@@ -5,6 +5,9 @@ import { useState } from "react";
 import { Send, Mail, MessageSquare, CheckCircle2 } from "lucide-react";
 import Footer from "@/components/Footer";
 
+
+
+
 export default function ContactPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");

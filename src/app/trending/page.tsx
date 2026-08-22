@@ -20,6 +20,8 @@ import { useState } from "react";
 import { RefreshCw, TrendingUp, TrendingDown, Trophy, Copy } from "lucide-react";
 import Footer from "@/components/Footer";
 
+
+
 // NEWS FEED DATA — ADD NEW ARTICLES HERE
 // Each article needs: id, cat, title, src, time
 // cat: "Crypto" or "Forex" (controls the badge color)

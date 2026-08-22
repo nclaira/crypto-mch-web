@@ -6,6 +6,8 @@ import PaywallModal from "@/components/PaywallModal";
 import Footer from "@/components/Footer";
 import { useCryptoAuth } from "@/lib/auth";
 
+
+
 export default function BooksPage() {
   const { user } = useCryptoAuth();
   const [books, setBooks] = useState<Book[]>([]);

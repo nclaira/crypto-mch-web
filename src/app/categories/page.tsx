@@ -17,6 +17,9 @@ import Footer from "@/components/Footer";
 import { useCryptoAuth } from "@/lib/auth";
 import { downloadBook } from "@/lib/api";
 
+
+
+
 // ---------------------------------------------------------------
 // CATEGORIES LIST — ADD NEW CATEGORIES HERE
 // ---------------------------------------------------------------

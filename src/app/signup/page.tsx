@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { Loader2, User, Mail, Lock, AlertCircle } from "lucide-react";
 import { api } from "@/lib/api"; // Our fetch helper
 
+
+
 export default function SignupPage() {
   const router = useRouter();
 

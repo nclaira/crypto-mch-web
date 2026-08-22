@@ -18,6 +18,7 @@ import { Loader2, Mail, Lock, AlertCircle } from "lucide-react";
 import { useCryptoAuth } from "@/lib/auth";           // Our shared auth context
 import { api } from "@/lib/api";                      // Our fetch helper
 
+
 export default function LoginPage() {
   const router = useRouter();
   const { setUser } = useCryptoAuth(); // Lets us save the user after login

@@ -29,8 +29,16 @@ const geistMono = Geist_Mono({
 
 // Browser tab title and description
 export const metadata: Metadata = {
-  title: "Mucamanza Crypto Hub",
-  description: "Premium crypto books and resources",
+  title:
+  {
+    default: "Mucamanza Crypto Hub | Premium Crypto Books",
+    template: "%s | Mucamanza Crypto Hub",
+  },
+    description: "Discover easy-to-read books, beginner-friendly crypto guides, and practical market tips for anyone who wants to learn.",
+    icons: {
+    icon: "/assets/logo.jpeg",
+    apple: "//assets/logo.jpeg",
+  },
 };
 
 export default function RootLayout({

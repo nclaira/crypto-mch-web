@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { User, BookOpen, ShieldCheck } from "lucide-react";
 
+
+
 export default function ProfilePage() {
   const { user } = useCryptoAuth();
   const router = useRouter();
