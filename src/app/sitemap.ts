@@ -1,11 +1,12 @@
-
-
 import { MetadataRoute } from 'next';
 
+export const dynamic = 'force-dynamic';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mucamanzacryptohub.com';
-
+  const rawUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mucamanzacryptohub.com';
+  
+  // Clean string in case Markdown format was passed
+  const baseUrl = rawUrl.replace(/\[.*?\]\((.*?)\)/, '$1').trim();
 
   return [
     {
@@ -28,4 +29,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 }
-export const dynamic = 'force-dynamic';
